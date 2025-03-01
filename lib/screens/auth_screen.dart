@@ -114,6 +114,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   prefixIcon: const Icon(Icons.lock, color: Colors.teal),
                 ),
+                onSubmitted: (_) => _authenticate(), // Pressionar Enter chama _authenticate()
               ),
               const SizedBox(height: 20),
               SizedBox(
