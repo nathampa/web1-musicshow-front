@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'auth_screen.dart';
+import 'home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -9,116 +11,134 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool isLogin = true;
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController userController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
   final ApiService apiService = ApiService();
+  final TextEditingController nomeController = TextEditingController();
+  final TextEditingController loginController = TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
+  bool isLoading = false;
+  bool isLogin = true;
 
-  void toggleAuthMode() {
-    setState(() {
-      isLogin = !isLogin;
-    });
+  void _toggleAuthMode() {
+    setState(() => isLogin = !isLogin);
   }
 
-  void submitForm() async {
-    String username = userController.text;
-    String password = passwordController.text;
-
-    if (isLogin) {
-      if (username.isEmpty || password.isEmpty) {
+  void _authenticate() async {
+    if (!isLogin) {
+      if (nomeController.text.isEmpty || loginController.text.isEmpty || senhaController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preencha todos os campos')),
+          const SnackBar(content: Text("Preencha todos os campos para se cadastrar.")),
         );
         return;
-      }
-      bool result = await apiService.login(username, password);
-      if (result) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login realizado!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Falha no login')),
-        );
       }
     } else {
-      String name = nameController.text;
-      if (name.isEmpty || username.isEmpty || password.isEmpty) {
+      if (loginController.text.isEmpty || senhaController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preencha todos os campos')),
+          const SnackBar(content: Text("Preencha todos os campos para fazer login.")),
         );
         return;
       }
-      bool result = await apiService.register(name, username, password);
-      if (result) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cadastro realizado!')),
+    }
+
+    setState(() => isLoading = true);
+    bool success;
+
+    if (isLogin) {
+      success = await apiService.login(loginController.text, senhaController.text);
+    } else {
+      success = await apiService.register(nomeController.text, loginController.text, senhaController.text);
+    }
+
+    setState(() => isLoading = false);
+
+    if (success) {
+      if (isLogin) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
-        setState(() {
-          isLogin = true;
-        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Falha no cadastro')),
+          const SnackBar(content: Text("Cadastro realizado com sucesso!")),
         );
+        _toggleAuthMode(); // Voltar para login após cadastrar
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(isLogin ? "Login falhou. Verifique suas credenciais." : "Erro ao cadastrar. Tente novamente.")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isLogin ? 'Login' : 'Cadastro'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (!isLogin) ...[
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+      backgroundColor: Colors.teal[50],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(isLogin ? Icons.lock : Icons.person_add, size: 80, color: Colors.teal),
+              const SizedBox(height: 20),
+              Text(
+                isLogin ? "Bem-vindo ao Music Show" : "Criar Conta",
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.teal),
+              ),
+              const SizedBox(height: 10),
+              if (!isLogin)
                 TextField(
-                  controller: userController,
-                  decoration: const InputDecoration(
-                    labelText: 'Login',
-                    border: OutlineInputBorder(),
+                  controller: nomeController,
+                  decoration: InputDecoration(
+                    labelText: "Nome",
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    prefixIcon: const Icon(Icons.person, color: Colors.teal),
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+              if (!isLogin) const SizedBox(height: 12),
+              TextField(
+                controller: loginController,
+                decoration: InputDecoration(
+                  labelText: "Usuário",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  prefixIcon: const Icon(Icons.person_outline, color: Colors.teal),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: senhaController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: "Senha",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  prefixIcon: const Icon(Icons.lock, color: Colors.teal),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _authenticate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  obscureText: true,
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(isLogin ? "Entrar" : "Cadastrar", style: const TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: submitForm,
-                  child: Text(isLogin ? 'Entrar' : 'Cadastrar'),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: _toggleAuthMode,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.teal, // Cor moderna e consistente
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                TextButton(
-                  onPressed: toggleAuthMode,
-                  child: Text(isLogin
-                      ? 'Não tem conta? Cadastre-se'
-                      : 'Já tem conta? Faça login'),
-                ),
-              ],
-            ),
+                child: Text(isLogin ? "Criar uma conta" : "Já tem uma conta? Faça login"),
+              ),
+            ],
           ),
         ),
       ),
