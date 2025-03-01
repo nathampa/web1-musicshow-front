@@ -53,8 +53,8 @@ class _AuthScreenState extends State<AuthScreen> {
     if (success) {
       if (isLogin) {
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -74,8 +74,9 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: Colors.teal[50],
       body: Center(
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(24.0),
+          constraints: const BoxConstraints(maxWidth: 400), // Define um limite de largura
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -83,9 +84,9 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 20),
               Text(
                 isLogin ? "Bem-vindo ao Music Show" : "Criar Conta",
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.teal),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               if (!isLogin)
                 TextField(
                   controller: nomeController,
