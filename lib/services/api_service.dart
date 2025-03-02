@@ -89,8 +89,42 @@ class ApiService {
       body: json.encode({"nome": nomeBanda}),
     );
 
-    print("Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
     return response.statusCode == 201 || response.statusCode == 200;
+  }
+
+  /// Adiciona um membro à banda pelo ID
+  Future<bool> addMember(int bandaId, int usuarioId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token == null) return false;
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/banda/adicionarUsuario"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"idBanda": bandaId, "idUsuario": usuarioId}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  /// Remove um membro da banda pelo ID
+  Future<bool> removeMember(int bandaId, int usuarioId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token == null) return false;
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/banda/removerUsuario"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"idBanda": bandaId, "idUsuario": usuarioId}),
+    );
+
+    return response.statusCode == 200;
   }
 }

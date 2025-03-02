@@ -3,9 +3,10 @@ import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BandDetailsScreen extends StatelessWidget {
+  final ApiService apiService = ApiService();
   final Map<String, dynamic> banda;
 
-  const BandDetailsScreen({super.key, required this.banda});
+  BandDetailsScreen({super.key, required this.banda});
 
   Future<int?> _getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -15,16 +16,52 @@ class BandDetailsScreen extends StatelessWidget {
   void _showManageMembersDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Gerenciar Membros"),
-        content: const Text("Aqui o responsável poderá adicionar ou remover membros."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Fechar"),
+      builder: (context) {
+        TextEditingController memberIdController = TextEditingController();
+
+        return AlertDialog(
+          title: const Text("Gerenciar Membros"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: memberIdController,
+                decoration: const InputDecoration(hintText: "ID do novo membro"),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  int? memberId = int.tryParse(memberIdController.text);
+                  if (memberId != null) {
+                    await apiService.addMember(banda["idBanda"], memberId);
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text("Adicionar Membro"),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  int? memberId = int.tryParse(memberIdController.text);
+                  if (memberId != null) {
+                    await apiService.removeMember(banda["idBanda"], memberId);
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text("Remover Membro"),
+              ),
+            ],
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Fechar"),
+            ),
+          ],
+        );
+      },
     );
   }
 
