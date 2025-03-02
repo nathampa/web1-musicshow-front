@@ -138,7 +138,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   foregroundColor: Colors.teal, // Cor moderna e consistente
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                child: Text(isLogin ? "Criar uma conta" : "Já tem uma conta? Faça login"),
+                child: Text(isLogin ? "Não tem conta? Cadastre-se" : "Já tem uma conta? Faça login"),
               ),
             ],
           ),

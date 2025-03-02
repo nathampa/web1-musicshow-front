@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.music_note, size: 50, color: Colors.white),
                   SizedBox(height: 10),
-                  Text("MusicShow", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text("Menu", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
             ),

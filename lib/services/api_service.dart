@@ -16,10 +16,12 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final token = data['token'];
+      final int userId = data['userId']; // Supondo que o backend retorna o ID do usuário
 
-      // Salva o token no SharedPreferences
+      // Salva o token e o ID do usuário no SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
+      await prefs.setInt('userId', userId);
 
       return true;
     } else {
@@ -39,23 +41,19 @@ class ApiService {
         "senha": senha,
       }),
     );
-
     return response.statusCode == 200;
   }
 
   /// Busca as bandas que o usuário está incluso
   Future<List<Map<String, dynamic>>> getUserBands() async {
-    // Recupera o token armazenado no SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    // Verifica se o token não é nulo antes de continuar
     if (token == null) {
       throw Exception("Usuário não autenticado.");
     }
 
     final url = Uri.parse("$baseUrl/banda/getBandasUsuario");
-
     try {
       final response = await http.get(
         url,
@@ -74,5 +72,25 @@ class ApiService {
     } catch (e) {
       throw Exception("Falha ao carregar bandas: $e");
     }
+  }
+
+  /// Cria uma nova banda
+  Future<bool> createBanda(String nomeBanda) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token == null) return false;
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/banda/cadastrarBanda"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: json.encode({"nome": nomeBanda}),
+    );
+
+    print("Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+    return response.statusCode == 201 || response.statusCode == 200;
   }
 }
