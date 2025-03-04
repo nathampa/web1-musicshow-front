@@ -89,7 +89,7 @@ class ApiService {
       body: json.encode({"nome": nomeBanda}),
     );
 
-    return response.statusCode == 201 || response.statusCode == 200;
+    return response.statusCode == 200;
   }
 
   /// Adiciona um membro à banda pelo ID
@@ -143,10 +143,10 @@ class ApiService {
       body: jsonEncode({"idBanda": bandaId, "nome": nomeRepertorio}),
     );
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.statusCode == 200) {
       return "Repertório criado com sucesso!";
     } else {
-      return "Usuário não autorizado!";
+      return "Erro ao apagar repertório";
     }
   }
 
@@ -163,10 +163,10 @@ class ApiService {
       },
     );
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.statusCode == 200) {
       return "Repertório excluido com sucesso!";
     } else {
-      return "Usuário não autorizado!";
+      return "Erro ao apagar repertório";
     }
   }
 

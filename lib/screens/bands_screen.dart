@@ -54,9 +54,9 @@ class _BandsScreenState extends State<BandsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.teal[50],
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text("Criar Nova Banda", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
+        title: const Text("Criar nova banda", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: _bandaController,
           decoration: InputDecoration(
@@ -92,7 +92,7 @@ class _BandsScreenState extends State<BandsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Minhas Bandas",
+          "Minhas bandas",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.teal,
@@ -134,7 +134,7 @@ class _BandsScreenState extends State<BandsScreen> {
                 itemCount: bandas.length,
                 itemBuilder: (context, index) {
                   final banda = bandas[index];
-                  final String nomeBanda = banda["nome"] ?? "Nome Desconhecido";
+                  final String nomeBanda = banda["nome"] ?? "Nome desconhecido";
 
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),

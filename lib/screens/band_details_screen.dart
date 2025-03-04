@@ -21,13 +21,18 @@ class BandDetailsScreen extends StatelessWidget {
         TextEditingController memberIdController = TextEditingController();
 
         return AlertDialog(
-          title: const Text("Gerenciar Membros"),
+          backgroundColor: Colors.white,
+          title: const Text("Gerenciar membros", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: memberIdController,
-                decoration: const InputDecoration(hintText: "ID do novo membro"),
+                decoration: InputDecoration(
+                    labelText: "ID do novo membro",
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    prefixIcon: const Icon(Icons.person_outline, color: Colors.teal)
+                ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 10),
@@ -39,7 +44,11 @@ class BandDetailsScreen extends StatelessWidget {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text("Adicionar Membro"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: const Text("Adicionar membro", style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
@@ -50,15 +59,18 @@ class BandDetailsScreen extends StatelessWidget {
                     Navigator.pop(context);
                   }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text("Remover Membro"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: const Text("Remover membro", style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Fechar"),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -72,15 +84,21 @@ class BandDetailsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Criar Novo Repertório"),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Criar novo repertório", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: _createRepertorioController,
-          decoration: const InputDecoration(hintText: "Nome do repertório"),
+          decoration: InputDecoration(
+            labelText: "Nome do repertório",
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            prefixIcon: const Icon(Icons.article_outlined, color: Colors.teal),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.red)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -96,7 +114,11 @@ class BandDetailsScreen extends StatelessWidget {
                 );
               }
             },
-            child: const Text("Criar"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text("Criar", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -109,15 +131,19 @@ class BandDetailsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Remover Repertório"),
+        backgroundColor: Colors.white,
+        title: const Text("Remover repertório"),
         content: TextField(
           controller: _deleteRepertorioController,
-          decoration: const InputDecoration(hintText: "ID do repertório"),
+          decoration: InputDecoration(
+            labelText: "ID do repertório",
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            prefixIcon: const Icon(Icons.article_outlined, color: Colors.teal),),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.red)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -133,7 +159,11 @@ class BandDetailsScreen extends StatelessWidget {
                 );
               }
             },
-            child: const Text("Criar"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text("Remover", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -156,7 +186,7 @@ class BandDetailsScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              banda["nome"] ?? "Detalhes da Banda",
+              banda["nome"] ?? "Detalhes da banda",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             backgroundColor: Colors.teal,
@@ -180,15 +210,15 @@ class BandDetailsScreen extends StatelessWidget {
                 itemBuilder: (context) => [
                   const PopupMenuItem(
                     value: "gerenciar",
-                    child: Text("Gerenciar Membros"),
+                    child: Text("Gerenciar membros"),
                   ),
                   const PopupMenuItem(
                     value: "createRepertorio",
-                    child: Text("Adicionar Repertório"),
+                    child: Text("Adicionar repertório"),
                   ),
                   const PopupMenuItem(
                     value: "deleteRepertorio",
-                    child: Text("Apagar Repertório"),
+                    child: Text("Remover repertório"),
                   ),
                 ],
               )
@@ -205,7 +235,7 @@ class BandDetailsScreen extends StatelessWidget {
                   const Icon(Icons.music_note, size: 80, color: Colors.teal),
                   const SizedBox(height: 20),
                   Text(
-                    banda["nome"] ?? "Nome Desconhecido",
+                    banda["nome"] ?? "Nome desconhecido",
                     style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal),
                   ),
                   const SizedBox(height: 12),
