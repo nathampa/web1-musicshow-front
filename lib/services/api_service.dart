@@ -170,4 +170,27 @@ class ApiService {
     }
   }
 
+  ///Busca os membros da banda
+  Future<List<Map<String, dynamic>>> getBandMembers(int bandaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.get(
+      Uri.parse("http://localhost:8080/banda/$bandaId/listarMusicos"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception("Erro ao buscar membros da banda.");
+    }
+  }
 }

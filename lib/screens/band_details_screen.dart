@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class BandDetailsScreen extends StatelessWidget {
-  final ApiService apiService = ApiService();
+class BandDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> banda;
-
-
   BandDetailsScreen({super.key, required this.banda});
+
+  @override
+  _BandDetailsScreenState createState() => _BandDetailsScreenState();
+}
+
+class _BandDetailsScreenState extends State<BandDetailsScreen> {
+  final ApiService apiService = ApiService();
+  late Future<List<Map<String, dynamic>>> _membrosFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
+  }
 
   Future<int?> _getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,7 +59,11 @@ class BandDetailsScreen extends StatelessWidget {
                   }
 
                   if (memberId != null) {
-                    await apiService.addMember(banda["idBanda"], memberId);
+                    await apiService.addMember(widget.banda["idBanda"], memberId);
+                    ///Recarrega a lista de membros
+                    setState(() {
+                      _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
+                    });
                     Navigator.pop(context);
                   }
                 },
@@ -71,7 +86,11 @@ class BandDetailsScreen extends StatelessWidget {
                   }
 
                   if (memberId != null) {
-                    await apiService.removeMember(banda["idBanda"], memberId);
+                    await apiService.removeMember(widget.banda["idBanda"], memberId);
+                    ///Recarrega a lista de membros
+                    setState(() {
+                      _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
+                    });
                     Navigator.pop(context);
                   }
                 },
@@ -125,7 +144,7 @@ class BandDetailsScreen extends StatelessWidget {
                 return;
               }else{
                 String nomeRepertorio = _createRepertorioController.text.trim();
-                String message = await apiService.createRepertorio(banda["idBanda"], nomeRepertorio);
+                String message = await apiService.createRepertorio(widget.banda["idBanda"], nomeRepertorio);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -208,13 +227,13 @@ class BandDetailsScreen extends StatelessWidget {
         }
 
         final int userId = snapshot.data!;
-        final int idResponsavel = banda["idResponsavel"];
+        final int idResponsavel = widget.banda["idResponsavel"];
         final bool isResponsavel = idResponsavel == userId;
 
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              banda["nome"] ?? "Detalhes da banda",
+              widget.banda["nome"] ?? "Detalhes da banda",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             backgroundColor: Colors.teal,
@@ -263,14 +282,46 @@ class BandDetailsScreen extends StatelessWidget {
                   const Icon(Icons.music_note, size: 80, color: Colors.teal),
                   const SizedBox(height: 20),
                   Text(
-                    banda["nome"] ?? "Nome desconhecido",
+                    widget.banda["nome"] ?? "Nome desconhecido",
                     style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "ID: ${banda["idBanda"]}\nResponsável: ${banda["idResponsavel"]}",
+                    "ID: ${widget.banda["idBanda"]}\nResponsável: ${widget.banda["idResponsavel"]}",
                     style: const TextStyle(fontSize: 18, color: Colors.black87),
                     textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Membros da Banda:",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal),
+                  ),
+                  const SizedBox(height: 10),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _membrosFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Erro ao carregar membros."));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text("Nenhum membro encontrado."));
+                      }
+
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            final membro = snapshot.data![index];
+                            return ListTile(
+                              leading: Icon(Icons.person, color: Colors.teal),
+                              title: Text(membro["nome"] ?? "Usuário desconhecido"),
+                              subtitle: Text("ID: ${membro["idUsuario"]}"),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
