@@ -60,11 +60,11 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
 
                   if (memberId != null) {
                     await apiService.addMember(widget.banda["idBanda"], memberId);
+                    Navigator.pop(context);
                     ///Recarrega a lista de membros
                     setState(() {
                       _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
                     });
-                    Navigator.pop(context);
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -87,11 +87,11 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
 
                   if (memberId != null) {
                     await apiService.removeMember(widget.banda["idBanda"], memberId);
+                    Navigator.pop(context);
                     ///Recarrega a lista de membros
                     setState(() {
                       _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
                     });
-                    Navigator.pop(context);
                   }
                 },
                 style: ElevatedButton.styleFrom(
