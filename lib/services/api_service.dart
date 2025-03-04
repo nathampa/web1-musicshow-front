@@ -127,4 +127,47 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  /// Cria um novo repertório para uma banda
+  Future<String> createRepertorio(int bandaId, String nomeRepertorio) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token == null) return "Usuário não autenticado.";
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/repertorios/cadastrarRepertorio"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"idBanda": bandaId, "nome": nomeRepertorio}),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return "Repertório criado com sucesso!";
+    } else {
+      return "Usuário não autorizado!";
+    }
+  }
+
+  /// Deleta um repertório de uma banda
+  Future<String> deleteRepertorio(int idRepertorio) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token == null) return "Usuário não autenticado.";
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/repertorios/excluir/$idRepertorio"),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return "Repertório excluido com sucesso!";
+    } else {
+      return "Usuário não autorizado!";
+    }
+  }
+
 }

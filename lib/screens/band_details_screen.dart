@@ -6,6 +6,7 @@ class BandDetailsScreen extends StatelessWidget {
   final ApiService apiService = ApiService();
   final Map<String, dynamic> banda;
 
+
   BandDetailsScreen({super.key, required this.banda});
 
   Future<int?> _getUserId() async {
@@ -65,6 +66,80 @@ class BandDetailsScreen extends StatelessWidget {
     );
   }
 
+  void _showCreateRepertorioDialog(BuildContext context) {
+    final TextEditingController _createRepertorioController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Criar Novo Repertório"),
+        content: TextField(
+          controller: _createRepertorioController,
+          decoration: const InputDecoration(hintText: "Nome do repertório"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              String nomeRepertorio = _createRepertorioController.text.trim();
+              if (nomeRepertorio.isNotEmpty) {
+                String message = await apiService.createRepertorio(banda["idBanda"], nomeRepertorio);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: message.contains("sucesso") ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text("Criar"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteRepertorioDialog(BuildContext context) {
+    final TextEditingController _deleteRepertorioController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Remover Repertório"),
+        content: TextField(
+          controller: _deleteRepertorioController,
+          decoration: const InputDecoration(hintText: "ID do repertório"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              int? idRepertorio = int.tryParse(_deleteRepertorioController.text);
+              if (idRepertorio != null) {
+                String message = await apiService.deleteRepertorio(idRepertorio);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: message.contains("sucesso") ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text("Criar"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int?>(
@@ -84,8 +159,41 @@ class BandDetailsScreen extends StatelessWidget {
               banda["nome"] ?? "Detalhes da Banda",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
             ),
-            centerTitle: true,
             backgroundColor: Colors.teal,
+            centerTitle: true,
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+            ),
+            actions: isResponsavel
+                ? [
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == "gerenciar") {
+                    _showManageMembersDialog(context);
+                  } else if (value == "createRepertorio") {
+                    _showCreateRepertorioDialog(context);
+                  }else if (value == "deleteRepertorio") {
+                    _showDeleteRepertorioDialog(context);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: "gerenciar",
+                    child: Text("Gerenciar Membros"),
+                  ),
+                  const PopupMenuItem(
+                    value: "createRepertorio",
+                    child: Text("Adicionar Repertório"),
+                  ),
+                  const PopupMenuItem(
+                    value: "deleteRepertorio",
+                    child: Text("Apagar Repertório"),
+                  ),
+                ],
+              )
+            ]
+                : null,
           ),
           backgroundColor: Colors.teal[50],
           body: Center(
@@ -110,13 +218,6 @@ class BandDetailsScreen extends StatelessWidget {
               ),
             ),
           ),
-          floatingActionButton: isResponsavel
-              ? FloatingActionButton(
-            onPressed: () => _showManageMembersDialog(context),
-            backgroundColor: Colors.teal,
-            child: const Icon(Icons.edit, color: Colors.white, size: 30),
-          )
-              : null,
         );
       },
     );
