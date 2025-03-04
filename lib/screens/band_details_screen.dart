@@ -39,6 +39,14 @@ class BandDetailsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   int? memberId = int.tryParse(memberIdController.text);
+
+                  if(memberIdController.text.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Preencha o ID.")),
+                    );
+                    return;
+                  }
+
                   if (memberId != null) {
                     await apiService.addMember(banda["idBanda"], memberId);
                     Navigator.pop(context);
@@ -54,6 +62,14 @@ class BandDetailsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   int? memberId = int.tryParse(memberIdController.text);
+
+                  if(memberIdController.text.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Preencha o ID.")),
+                    );
+                    return;
+                  }
+
                   if (memberId != null) {
                     await apiService.removeMember(banda["idBanda"], memberId);
                     Navigator.pop(context);
@@ -102,8 +118,13 @@ class BandDetailsScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              String nomeRepertorio = _createRepertorioController.text.trim();
-              if (nomeRepertorio.isNotEmpty) {
+              if(_createRepertorioController.text.isEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Preencha o nome do repertório")),
+                );
+                return;
+              }else{
+                String nomeRepertorio = _createRepertorioController.text.trim();
                 String message = await apiService.createRepertorio(banda["idBanda"], nomeRepertorio);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -147,6 +168,13 @@ class BandDetailsScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              if(_deleteRepertorioController.text.isEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Preencha o ID do repertório")),
+                );
+                return;
+              }
+
               int? idRepertorio = int.tryParse(_deleteRepertorioController.text);
               if (idRepertorio != null) {
                 String message = await apiService.deleteRepertorio(idRepertorio);
