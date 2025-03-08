@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'repertorio_details_screen.dart';
 
 class BandDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> banda;
@@ -378,6 +379,15 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                         leading: const Icon(Icons.library_music, color: Colors.teal),
                                         title: Text(repertorio["nome"] ?? "Repertório desconhecido"),
                                         subtitle: Text("ID: ${repertorio["idRepertorio"]}"),
+                                        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.teal),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => RepertorioDetailsScreen(repertorio: repertorio),
+                                            ),
+                                          );
+                                        },
                                       );
                                     },
                                   );
