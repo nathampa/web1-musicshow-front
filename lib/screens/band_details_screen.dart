@@ -13,11 +13,13 @@ class BandDetailsScreen extends StatefulWidget {
 class _BandDetailsScreenState extends State<BandDetailsScreen> {
   final ApiService apiService = ApiService();
   late Future<List<Map<String, dynamic>>> _membrosFuture;
+  late Future<List<Map<String, dynamic>>> _repertoriosFuture; // ✅ Adicionado
 
   @override
   void initState() {
     super.initState();
     _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
+    _repertoriosFuture = apiService.getBandRepertorios(widget.banda["idBanda"]); // ✅ Carregar repertórios
   }
 
   Future<int?> _getUserId() async {
@@ -146,6 +148,9 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                 String nomeRepertorio = _createRepertorioController.text.trim();
                 String message = await apiService.createRepertorio(widget.banda["idBanda"], nomeRepertorio);
                 Navigator.pop(context);
+                setState(() {
+                  _repertoriosFuture = apiService.getBandRepertorios(widget.banda["idBanda"]);
+                });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(message),
@@ -198,6 +203,9 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
               if (idRepertorio != null) {
                 String message = await apiService.deleteRepertorio(idRepertorio);
                 Navigator.pop(context);
+                setState(() {
+                  _repertoriosFuture = apiService.getBandRepertorios(widget.banda["idBanda"]);
+                });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(message),
@@ -250,7 +258,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                     _showManageMembersDialog(context);
                   } else if (value == "createRepertorio") {
                     _showCreateRepertorioDialog(context);
-                  }else if (value == "deleteRepertorio") {
+                  } else if (value == "deleteRepertorio") {
                     _showDeleteRepertorioDialog(context);
                   }
                 },
@@ -273,58 +281,116 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                 : null,
           ),
           backgroundColor: Colors.teal[50],
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.music_note, size: 80, color: Colors.teal),
-                  const SizedBox(height: 20),
-                  Text(
-                    widget.banda["nome"] ?? "Nome desconhecido",
-                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "ID: ${widget.banda["idBanda"]}\nResponsável: ${widget.banda["idResponsavel"]}",
-                    style: const TextStyle(fontSize: 18, color: Colors.black87),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Membros da Banda:",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal),
-                  ),
-                  const SizedBox(height: 10),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _membrosFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text("Erro ao carregar membros."));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: Text("Nenhum membro encontrado."));
-                      }
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // ✅ Nome da Banda, ID da Banda e ID do Responsável (Mantido)
+                const Icon(Icons.music_note, size: 80, color: Colors.teal),
+                const SizedBox(height: 20),
+                Text(
+                  widget.banda["nome"] ?? "Nome desconhecido",
+                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "ID: ${widget.banda["idBanda"]}\nResponsável: ${widget.banda["idResponsavel"]}",
+                  style: const TextStyle(fontSize: 18, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
 
-                      return Expanded(
-                        child: ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            final membro = snapshot.data![index];
-                            return ListTile(
-                              leading: Icon(Icons.person, color: Colors.teal),
-                              title: Text(membro["nome"] ?? "Usuário desconhecido"),
-                              subtitle: Text("ID: ${membro["idUsuario"]}"),
-                            );
-                          },
+                // 🔹 CENTRALIZAÇÃO
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centraliza horizontalmente
+                    crossAxisAlignment: CrossAxisAlignment.center, // Centraliza verticalmente
+                    children: [
+                      // 🔹 Lista de Membros
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Membros da Banda:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal)),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 400, // Altura fixa para evitar overflow
+                              child: FutureBuilder<List<Map<String, dynamic>>>(
+                                future: _membrosFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return const Center(child: Text("Erro ao carregar membros."));
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return const Center(child: Text("Nenhum membro encontrado."));
+                                  }
+
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final membro = snapshot.data![index];
+                                      return ListTile(
+                                        leading: const Icon(Icons.person, color: Colors.teal),
+                                        title: Text(membro["nome"] ?? "Usuário desconhecido"),
+                                        subtitle: Text("ID: ${membro["idUsuario"]}"),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+
+                      const SizedBox(width: 20), // Espaço entre as listas
+
+                      // 🔹 Lista de Repertórios
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Repertórios da Banda:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal)),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 400, // Altura fixa para evitar overflow
+                              child: FutureBuilder<List<Map<String, dynamic>>>(
+                                future: _repertoriosFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return const Center(child: Text("Erro ao carregar repertórios."));
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return const Center(child: Text("Nenhum repertório encontrado."));
+                                  }
+
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final repertorio = snapshot.data![index];
+                                      return ListTile(
+                                        leading: const Icon(Icons.library_music, color: Colors.teal),
+                                        title: Text(repertorio["nome"] ?? "Repertório desconhecido"),
+                                        subtitle: Text("ID: ${repertorio["idRepertorio"]}"),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
