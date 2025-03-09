@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.library_music, color: Colors.teal),
+              leading: const Icon(Icons.music_note, color: Colors.teal),
               title: const Text("Minhas Musicas"),
               onTap: () {
                 Navigator.push(
