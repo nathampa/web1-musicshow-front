@@ -1,58 +1,107 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/services/api_service.dart';
+import '../services/api_service.dart';
 
 class MyMusicsScreen extends StatefulWidget {
+  const MyMusicsScreen({super.key});
+
   @override
   _MyMusicsScreenState createState() => _MyMusicsScreenState();
 }
 
 class _MyMusicsScreenState extends State<MyMusicsScreen> {
   final ApiService apiService = ApiService();
-  List<Map<String, dynamic>> musicas = [];
-  bool isLoading = true;
+  late Future<List<Map<String, dynamic>>> _musicsFuture;
 
   @override
   void initState() {
     super.initState();
-    fetchMusicas();
-  }
-
-  Future<void> fetchMusicas() async {
-    try {
-      List<Map<String, dynamic>> response = await apiService.getMinhasMusicas();
-      setState(() {
-        musicas = response;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      print(e.toString());
-    }
+    _musicsFuture = apiService.getMinhasMusicas();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Minhas Músicas', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),),backgroundColor: Colors.teal,
+      appBar: AppBar(
+        title: const Text(
+          "Minhas Músicas",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Colors.teal,
         centerTitle: true,
         elevation: 6,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        ), ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : musicas.isEmpty
-          ? Center(child: Text('Nenhuma música encontrada.'))
-          : ListView.builder(
-        itemCount: musicas.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(musicas[index]['nomeMusica']),
-            subtitle: Text('Artista: ${musicas[index]['artista'] ?? 'Desconhecido'}'),
-          );
-        },
+        ),
+      ),
+      backgroundColor: Colors.teal[50],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.music_note, size: 80, color: Colors.teal),
+              const SizedBox(height: 20),
+              const Text(
+                "Minhas Músicas",
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "Aqui estão todas as músicas associadas a você.",
+                style: TextStyle(fontSize: 18, color: Colors.black87),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _musicsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      String errorMessage = snapshot.error.toString();
+                      if (errorMessage.contains("Você ainda não tem músicas cadastradas")) {
+                        return const Center(
+                          child: Text(
+                            "Você ainda não tem músicas cadastradas.",
+                            style: TextStyle(fontSize: 18, color: Colors.black54),
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text(
+                            "Erro ao carregar suas músicas.",
+                            style: TextStyle(fontSize: 18, color: Colors.red),
+                          ),
+                        );
+                      }
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "Nenhuma música encontrada.",
+                          style: TextStyle(fontSize: 18, color: Colors.black54),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final music = snapshot.data![index];
+                        return ListTile(
+                          leading: const Icon(Icons.music_note, color: Colors.teal),
+                          title: Text(music["titulo"] ?? "Música desconhecida"),
+                          subtitle: Text("Artista: ${music["artista"] ?? "Desconhecido"}"),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
