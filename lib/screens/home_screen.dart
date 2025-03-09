@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled/screens/my_musics_screen.dart';
 import 'bands_screen.dart';
 import 'auth_screen.dart';
 import '../services/api_service.dart';
@@ -59,6 +60,16 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const BandsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.library_music, color: Colors.teal),
+              title: const Text("Minhas Musicas"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyMusicsScreen()),
                 );
               },
             ),
