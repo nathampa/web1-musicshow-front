@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.library_music, color: Colors.teal),
+              leading: const Icon(Icons.mic_external_on, color: Colors.teal),
               title: const Text("Minhas bandas"),
               onTap: () {
                 Navigator.push(

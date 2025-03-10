@@ -66,8 +66,8 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                   });
                 }
               },
-              icon: const Icon(Icons.upload_file),
-              label: const Text("Selecionar PDF"),
+              icon: const Icon(Icons.upload_file, color: Colors.white,),
+              label: const Text("Selecionar PDF", style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
