@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
   final String baseUrl = "http://localhost:8080";
@@ -272,8 +275,8 @@ class ApiService {
     }
   }
 
-  /// Cadastra uma nova música para o usuário autenticado
-  Future<bool> cadastrarMusica(String nomeMusica) async {
+  /// Adiciona uma nova música com título e PDF
+  Future<bool> addMusic(String titulo, Uint8List pdfBytes, String fileName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -281,17 +284,20 @@ class ApiService {
       throw Exception("Usuário não autenticado.");
     }
 
-    final response = await http.post(
-      Uri.parse("http://localhost:8080/cadastrarMusica"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "titulo": nomeMusica
-      }),
-    );
+    var uri = Uri.parse("$baseUrl/musicas/cadastrarMusica");
+    var request = http.MultipartRequest("POST", uri)
+      ..headers["Authorization"] = "Bearer $token"
+      ..fields["titulo"] = titulo
+      ..files.add(
+        http.MultipartFile.fromBytes(
+          'arquivoPdf',
+          pdfBytes,
+          filename: fileName,
+          contentType: MediaType('application', 'pdf'),
+        ),
+      );
 
+    var response = await request.send();
     return response.statusCode == 200;
   }
 }

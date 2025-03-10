@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
+import 'dart:io';
 
 class MyMusicsScreen extends StatefulWidget {
   const MyMusicsScreen({super.key});
@@ -15,7 +18,108 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
   @override
   void initState() {
     super.initState();
-    _musicsFuture = apiService.getMinhasMusicas();
+    _loadMusics();
+  }
+
+  void _loadMusics() {
+    setState(() {
+      _musicsFuture = apiService.getMinhasMusicas();
+    });
+  }
+
+  void _showAddMusicDialog() {
+    TextEditingController _tituloController = TextEditingController();
+    Uint8List? selectedFile;
+    String? fileName;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text(
+          "Adicionar Música",
+          style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _tituloController,
+              decoration: InputDecoration(
+                labelText: "Título da Música",
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                prefixIcon: const Icon(Icons.music_note, color: Colors.teal),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: () async {
+                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['pdf'],
+                );
+                if (result != null && result.files.single.bytes != null) {
+                  setState(() {
+                    selectedFile = result.files.single.bytes;
+                    fileName = result.files.single.name;
+                  });
+                }
+              },
+              icon: const Icon(Icons.upload_file),
+              label: const Text("Selecionar PDF"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            if (fileName != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "Arquivo: $fileName",
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (_tituloController.text.isEmpty || selectedFile == null || fileName == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Preencha o título e selecione um arquivo PDF.")),
+                );
+                return;
+              }
+
+              bool success = await apiService.addMusic(_tituloController.text, selectedFile!, fileName!);
+              Navigator.pop(context);
+
+              if (success) {
+                _loadMusics();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Música adicionada com sucesso!")),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Erro ao adicionar música.")),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text("Adicionar", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -60,22 +164,12 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      String errorMessage = snapshot.error.toString();
-                      if (errorMessage.contains("Você ainda não tem músicas cadastradas")) {
-                        return const Center(
-                          child: Text(
-                            "Você ainda não tem músicas cadastradas.",
-                            style: TextStyle(fontSize: 18, color: Colors.black54),
-                          ),
-                        );
-                      } else {
-                        return const Center(
-                          child: Text(
-                            "Erro ao carregar suas músicas.",
-                            style: TextStyle(fontSize: 18, color: Colors.red),
-                          ),
-                        );
-                      }
+                      return const Center(
+                        child: Text(
+                          "Erro ao carregar suas músicas.",
+                          style: TextStyle(fontSize: 18, color: Colors.red),
+                        ),
+                      );
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Center(
                         child: Text(
@@ -102,6 +196,11 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddMusicDialog,
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
   }

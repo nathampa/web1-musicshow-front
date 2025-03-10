@@ -14,13 +14,13 @@ class BandDetailsScreen extends StatefulWidget {
 class _BandDetailsScreenState extends State<BandDetailsScreen> {
   final ApiService apiService = ApiService();
   late Future<List<Map<String, dynamic>>> _membrosFuture;
-  late Future<List<Map<String, dynamic>>> _repertoriosFuture; // ✅ Adicionado
+  late Future<List<Map<String, dynamic>>> _repertoriosFuture;
 
   @override
   void initState() {
     super.initState();
     _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
-    _repertoriosFuture = apiService.getBandRepertorios(widget.banda["idBanda"]); // ✅ Carregar repertórios
+    _repertoriosFuture = apiService.getBandRepertorios(widget.banda["idBanda"]);
   }
 
   Future<int?> _getUserId() async {
