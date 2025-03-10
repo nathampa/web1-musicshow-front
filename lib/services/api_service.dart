@@ -271,4 +271,27 @@ class ApiService {
       throw Exception("Erro ao buscar músicas do usuário.");
     }
   }
+
+  /// Cadastra uma nova música para o usuário autenticado
+  Future<bool> cadastrarMusica(String nomeMusica) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.post(
+      Uri.parse("http://localhost:8080/cadastrarMusica"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "titulo": nomeMusica
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
 }
