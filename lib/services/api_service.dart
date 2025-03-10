@@ -238,8 +238,6 @@ class ApiService {
       },
     );
 
-    print(response.statusCode);
-
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     }else if (response.statusCode == 404){

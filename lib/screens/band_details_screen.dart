@@ -316,7 +316,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             const Text("Membros da Banda:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal)),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height: 400, // Altura fixa para evitar overflow
+                              height: 350, // Altura fixa para evitar overflow
                               child: FutureBuilder<List<Map<String, dynamic>>>(
                                 future: _membrosFuture,
                                 builder: (context, snapshot) {
@@ -358,7 +358,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             const Text("Repertórios da Banda:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal)),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height: 400, // Altura fixa para evitar overflow
+                              height: 350, // Altura fixa para evitar overflow
                               child: FutureBuilder<List<Map<String, dynamic>>>(
                                 future: _repertoriosFuture,
                                 builder: (context, snapshot) {
