@@ -18,6 +18,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
 
   // Definindo a cor Mocha Mousse
   static const Color mochaMousse = Color(0xFFA47864);
+  static const Color backgroundColor = Color(0xFFF8F5F3);
 
   @override
   void initState() {
@@ -378,160 +379,521 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
         final bool isResponsavel = idResponsavel == userId;
 
         return Scaffold(
+          backgroundColor: Color(0xFFF8F5F3), // Usando o mesmo backgroundColor da HomeScreen
           appBar: AppBar(
             title: Text(
               widget.banda["nome"] ?? "Detalhes da banda",
               style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: mochaMousse,
               ),
             ),
-            backgroundColor: mochaMousse,
-            centerTitle: true,
+            backgroundColor: Colors.transparent,
             elevation: 0,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+            centerTitle: true,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.arrow_back, color: mochaMousse, size: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
             ),
-            actions: isResponsavel
-                ? [
-              PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, color: Colors.white),
-                offset: Offset(0, 45),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                color: Colors.white,
-                elevation: 3,
-                onSelected: (value) {
-                  if (value == "gerenciar") {
-                    _showManageMembersDialog(context);
-                  } else if (value == "createRepertorio") {
-                    _showCreateRepertorioDialog(context);
-                  } else if (value == "deleteRepertorio") {
-                    _showDeleteRepertorioDialog(context);
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: "gerenciar",
-                    child: Row(
-                      children: [
-                        Icon(Icons.group, color: mochaMousse, size: 18),
-                        SizedBox(width: 12),
-                        Text("Gerenciar membros"),
+            actions: isResponsavel ? [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: PopupMenuButton<String>(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
                       ],
                     ),
+                    child: Icon(Icons.more_vert, color: mochaMousse, size: 20),
                   ),
-                  PopupMenuItem(
-                    value: "createRepertorio",
-                    child: Row(
-                      children: [
-                        Icon(Icons.add_circle, color: mochaMousse, size: 18),
-                        SizedBox(width: 12),
-                        Text("Adicionar repertório"),
-                      ],
+                  offset: Offset(0, 45),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  color: Colors.white,
+                  elevation: 3,
+                  onSelected: (value) {
+                    if (value == "gerenciar") {
+                      _showManageMembersDialog(context);
+                    } else if (value == "createRepertorio") {
+                      _showCreateRepertorioDialog(context);
+                    } else if (value == "deleteRepertorio") {
+                      _showDeleteRepertorioDialog(context);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: "gerenciar",
+                      child: Row(
+                        children: [
+                          Icon(Icons.group, color: mochaMousse, size: 18),
+                          SizedBox(width: 12),
+                          Text("Gerenciar membros"),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: "deleteRepertorio",
-                    child: Row(
-                      children: [
-                        Icon(Icons.remove_circle, color: Colors.red.shade400, size: 18),
-                        SizedBox(width: 12),
-                        Text("Remover repertório"),
-                      ],
+                    PopupMenuItem(
+                      value: "createRepertorio",
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_circle, color: mochaMousse, size: 18),
+                          SizedBox(width: 12),
+                          Text("Adicionar repertório"),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    PopupMenuItem(
+                      value: "deleteRepertorio",
+                      child: Row(
+                        children: [
+                          Icon(Icons.remove_circle, color: Colors.red.shade400, size: 18),
+                          SizedBox(width: 12),
+                          Text("Remover repertório"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               )
-            ]
-                : null,
+            ] : null,
           ),
-          backgroundColor: mochaMousse.withOpacity(0.1),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Layout responsivo baseado na largura da tela
                 final bool isWideScreen = constraints.maxWidth > 600;
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Card de detalhes da banda
-                      Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 0,
-                        color: Colors.white,
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: mochaMousse.withOpacity(0.1),
-                                  shape: BoxShape.circle,
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: CustomScrollView(
+                      slivers: [
+                        // Cabeçalho da banda
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Container(
+                              padding: EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [mochaMousse, mochaMousse.withOpacity(0.8)],
                                 ),
-                                child: Icon(Icons.music_note, size: 60, color: mochaMousse),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mochaMousse.withOpacity(0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 16),
-                              Text(
-                                widget.banda["nome"] ?? "Nome desconhecido",
-                                style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: mochaMousse
-                                ),
-                                textAlign: TextAlign.center,
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    right: -20,
+                                    bottom: -20,
+                                    child: Icon(
+                                      Icons.music_note,
+                                      size: 150,
+                                      color: Colors.white.withOpacity(0.1),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(Icons.music_note, size: 40, color: Colors.white),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        widget.banda["nome"] ?? "Nome desconhecido",
+                                        style: TextStyle(
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              "ID: ${widget.banda["idBanda"]}",
+                                              style: TextStyle(fontSize: 14, color: Colors.white),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.person, color: Colors.white, size: 14),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Resp: ${widget.banda["idResponsavel"]}",
+                                                  style: TextStyle(fontSize: 14, color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 8),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: mochaMousse.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  "ID: ${widget.banda["idBanda"]}",
-                                  style: TextStyle(fontSize: 14, color: mochaMousse),
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                "Responsável: ${widget.banda["idResponsavel"]}",
-                                style: TextStyle(fontSize: 14, color: Colors.black54),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 16),
 
-                      // Layout responsivo para listas
-                      isWideScreen
-                          ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Lista de Membros
-                          Expanded(
-                            child: _buildMembrosCard(),
+                        // Título da seção Membros
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: mochaMousse.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(Icons.group, color: mochaMousse, size: 20),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  "Membros da Banda",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    thickness: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(width: 16),
-                          // Lista de Repertórios
-                          Expanded(
-                            child: _buildRepertoriosCard(),
+                        ),
+
+                        // Lista de Membros
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              height: 250,
+                              child: FutureBuilder<List<Map<String, dynamic>>>(
+                                future: _membrosFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator(color: mochaMousse));
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
+                                          SizedBox(height: 16),
+                                          Text("Erro ao carregar membros.", style: TextStyle(color: Colors.red.shade400)),
+                                        ],
+                                      ),
+                                    );
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.person_off, color: Colors.black38, size: 48),
+                                          SizedBox(height: 16),
+                                          Text("Nenhum membro encontrado.", style: TextStyle(color: Colors.black54)),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: ListView.separated(
+                                      padding: EdgeInsets.all(2),
+                                      itemCount: snapshot.data!.length,
+                                      separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.1)),
+                                      itemBuilder: (context, index) {
+                                        final membro = snapshot.data![index];
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                          leading: Container(
+                                            padding: EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: mochaMousse.withOpacity(0.1),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(Icons.person, color: mochaMousse, size: 24),
+                                          ),
+                                          title: Text(
+                                            membro["nome"] ?? "Usuário desconhecido",
+                                            style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333)),
+                                          ),
+                                          subtitle: Text(
+                                            "ID: ${membro["idUsuario"]}",
+                                            style: TextStyle(fontSize: 12, color: Colors.black54),
+                                          ),
+                                          trailing: isResponsavel && membro["idUsuario"] != userId ?
+                                          Container(
+                                            padding: EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.shade400.withOpacity(0.1),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(Icons.remove_circle_outline, color: Colors.red.shade400, size: 16),
+                                          ) : null,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                          hoverColor: mochaMousse.withOpacity(0.05),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
-                        ],
-                      )
-                          : Column(
-                        children: [
-                          _buildMembrosCard(),
-                          SizedBox(height: 16),
-                          _buildRepertoriosCard(),
-                        ],
-                      ),
-                    ],
+                        ),
+
+                        // Título da seção Repertórios
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: mochaMousse.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(Icons.library_music, color: mochaMousse, size: 20),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  "Repertórios da Banda",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    thickness: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Repertórios da Banda
+                        SliverPadding(
+                          padding: EdgeInsets.only(bottom: 24, left: 16, right: 16),
+                          sliver: SliverToBoxAdapter(
+                            child: FutureBuilder<List<Map<String, dynamic>>>(
+                              future: _repertoriosFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(child: CircularProgressIndicator(color: mochaMousse)),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
+                                          SizedBox(height: 16),
+                                          Text("Erro ao carregar repertórios.", style: TextStyle(color: Colors.red.shade400)),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                  return Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.queue_music, color: Colors.black38, size: 48),
+                                          SizedBox(height: 16),
+                                          Text("Nenhum repertório encontrado.", style: TextStyle(color: Colors.black54)),
+                                          if (isResponsavel) ...[
+                                            SizedBox(height: 16),
+                                            ElevatedButton.icon(
+                                              onPressed: () => _showCreateRepertorioDialog(context),
+                                              icon: Icon(Icons.add, size: 18),
+                                              label: Text("Criar Repertório"),
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor: mochaMousse,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                // Grid layout para telas largas, lista para telas estreitas
+                                if (isWideScreen) {
+                                  return GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 1.5,
+                                    ),
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final repertorio = snapshot.data![index];
+                                      return _buildRepertorioCard(context, repertorio);
+                                    },
+                                  );
+                                } else {
+                                  return ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: snapshot.data!.length,
+                                    separatorBuilder: (context, index) => SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final repertorio = snapshot.data![index];
+                                      return _buildRepertorioCard(context, repertorio);
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+
+                        // Botão de adicionar repertório (apenas para responsável)
+                        if (isResponsavel && snapshot.data != null && snapshot.data! > 0)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: Center(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _showCreateRepertorioDialog(context),
+                                  icon: Icon(Icons.add, size: 18),
+                                  label: Text("Adicionar Novo Repertório"),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: mochaMousse,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -542,199 +904,92 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
     );
   }
 
-  Widget _buildMembrosCard() {
+  Widget _buildRepertorioCard(BuildContext context, Map<String, dynamic> repertorio) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 0,
-      color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.group, color: mochaMousse),
-                SizedBox(width: 8),
-                Text(
-                    "Membros da Banda",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: mochaMousse
-                    )
-                ),
-              ],
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.1),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RepertorioDetailsScreen(repertorio: repertorio, banda: widget.banda),
             ),
-            Divider(color: mochaMousse.withOpacity(0.2), thickness: 1.5),
-            SizedBox(height: 8),
-            SizedBox(
-              height: 300,
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _membrosFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator(color: mochaMousse));
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
-                          SizedBox(height: 16),
-                          Text("Erro ao carregar membros.", style: TextStyle(color: Colors.red.shade400)),
-                        ],
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.person_off, color: Colors.black38, size: 48),
-                          SizedBox(height: 16),
-                          Text("Nenhum membro encontrado.", style: TextStyle(color: Colors.black54)),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.separated(
-                    itemCount: snapshot.data!.length,
-                    separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
-                    itemBuilder: (context, index) {
-                      final membro = snapshot.data![index];
-                      return ListTile(
-                        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        leading: CircleAvatar(
-                          backgroundColor: mochaMousse.withOpacity(0.1),
-                          child: Icon(Icons.person, color: mochaMousse),
-                        ),
-                        title: Text(
-                          membro["nome"] ?? "Usuário desconhecido",
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        subtitle: Text(
-                          "ID: ${membro["idUsuario"]}",
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
-                        ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        hoverColor: mochaMousse.withOpacity(0.1),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRepertoriosCard() {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 0,
-      color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.library_music, color: mochaMousse),
-                SizedBox(width: 8),
-                Text(
-                    "Repertórios da Banda",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: mochaMousse
-                    )
-                ),
-              ],
-            ),
-            Divider(color: mochaMousse.withOpacity(0.2), thickness: 1.5),
-            SizedBox(height: 8),
-            SizedBox(
-              height: 300,
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _repertoriosFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator(color: mochaMousse));
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
-                          SizedBox(height: 16),
-                          Text("Erro ao carregar repertórios.", style: TextStyle(color: Colors.red.shade400)),
-                        ],
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.queue_music, color: Colors.black38, size: 48),
-                          SizedBox(height: 16),
-                          Text("Nenhum repertório encontrado.", style: TextStyle(color: Colors.black54)),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.separated(
-                    itemCount: snapshot.data!.length,
-                    separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
-                    itemBuilder: (context, index) {
-                      final repertorio = snapshot.data![index];
-                      return ListTile(
-                        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        leading: CircleAvatar(
-                          backgroundColor: mochaMousse.withOpacity(0.1),
-                          child: Icon(Icons.music_note, color: mochaMousse),
-                        ),
-                        title: Text(
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: mochaMousse.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.music_note, color: mochaMousse, size: 20),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           repertorio["nome"] ?? "Repertório desconhecido",
-                          style: TextStyle(fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF333333),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        subtitle: Text(
+                        SizedBox(height: 4),
+                        Text(
                           "ID: ${repertorio["idRepertorio"]}",
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
-                        ),
-                        trailing: Container(
-                          decoration: BoxDecoration(
-                            color: mochaMousse.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Icon(Icons.arrow_forward, size: 16, color: mochaMousse),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
                           ),
                         ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        hoverColor: mochaMousse.withOpacity(0.1),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RepertorioDetailsScreen(repertorio: repertorio, banda: widget.banda),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Spacer(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: mochaMousse.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Ver detalhes",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: mochaMousse,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(Icons.arrow_forward, size: 12, color: mochaMousse),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
