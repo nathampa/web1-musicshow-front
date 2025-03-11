@@ -410,73 +410,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            actions: isResponsavel ? [
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: PopupMenuButton<String>(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(50),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Icon(Icons.more_vert, color: mochaMousse, size: 20),
-                  ),
-                  offset: Offset(0, 45),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  color: Colors.white,
-                  elevation: 3,
-                  onSelected: (value) {
-                    if (value == "gerenciar") {
-                      _showManageMembersDialog(context);
-                    } else if (value == "createRepertorio") {
-                      _showCreateRepertorioDialog(context);
-                    } else if (value == "deleteRepertorio") {
-                      _showDeleteRepertorioDialog(context);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: "gerenciar",
-                      child: Row(
-                        children: [
-                          Icon(Icons.group, color: mochaMousse, size: 18),
-                          SizedBox(width: 12),
-                          Text("Gerenciar membros"),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: "createRepertorio",
-                      child: Row(
-                        children: [
-                          Icon(Icons.add_circle, color: mochaMousse, size: 18),
-                          SizedBox(width: 12),
-                          Text("Adicionar repertório"),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: "deleteRepertorio",
-                      child: Row(
-                        children: [
-                          Icon(Icons.remove_circle, color: Colors.red.shade400, size: 18),
-                          SizedBox(width: 12),
-                          Text("Remover repertório"),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ] : null,
+            actions: null
           ),
           body: SafeArea(
             child: LayoutBuilder(
@@ -576,6 +510,33 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                           ),
                                         ],
                                       ),
+                                      // Adicionar os botões de controle apenas para o responsável
+                                      if (isResponsavel) ...[
+                                        SizedBox(height: 24),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            _buildActionButton(
+                                              icon: Icons.group,
+                                              label: "Gerenciar\nMembros",
+                                              onTap: () => _showManageMembersDialog(context),
+                                            ),
+                                            SizedBox(width: 16),
+                                            _buildActionButton(
+                                              icon: Icons.add_circle,
+                                              label: "Adicionar\nRepertório",
+                                              onTap: () => _showCreateRepertorioDialog(context),
+                                            ),
+                                            SizedBox(width: 16),
+                                            _buildActionButton(
+                                              icon: Icons.remove_circle,
+                                              label: "Remover\nRepertório",
+                                              color: Colors.red.shade400,
+                                              onTap: () => _showDeleteRepertorioDialog(context),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ],
@@ -870,28 +831,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             ),
                           ),
                         ),
-
-                        // Botão de adicionar repertório (apenas para responsável)
-                        if (isResponsavel && snapshot.data != null && snapshot.data! > 0)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 24.0),
-                              child: Center(
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _showCreateRepertorioDialog(context),
-                                  icon: Icon(Icons.add, size: 18),
-                                  label: Text("Adicionar Novo Repertório"),
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: mochaMousse,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -901,6 +840,48 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                  icon,
+                  color: color ?? Colors.white,
+                  size: 20
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
