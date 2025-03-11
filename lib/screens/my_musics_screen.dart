@@ -186,7 +186,7 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                         return ListTile(
                           leading: const Icon(Icons.music_note, color: Colors.teal),
                           title: Text(music["titulo"] ?? "Música desconhecida"),
-                          subtitle: Text("Artista: ${music["artista"] ?? "Desconhecido"}"),
+                          subtitle: Text("ID: ${music["idMusica"] ?? "Desconhecido"}"),
                         );
                       },
                     );

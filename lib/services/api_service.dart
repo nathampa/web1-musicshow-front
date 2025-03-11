@@ -298,4 +298,29 @@ class ApiService {
     var response = await request.send();
     return response.statusCode == 200;
   }
+
+  ///Adiciona uma musica ao repertório
+  Future<bool> addMusicToRepertorio(int repertorioId, int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/repertorios/adicionarMusica"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "idRepertorio": repertorioId,
+        "idMusica": musicaId,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
 }

@@ -384,7 +384,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => RepertorioDetailsScreen(repertorio: repertorio),
+                                              builder: (context) => RepertorioDetailsScreen(repertorio: repertorio, banda: widget.banda),
                                             ),
                                           );
                                         },
