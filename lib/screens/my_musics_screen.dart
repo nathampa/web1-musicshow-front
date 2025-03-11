@@ -340,7 +340,7 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    GestureDetector(
+                                    InkWell(
                                       onTap: _showAddMusicDialog,
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -574,13 +574,6 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
             );
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddMusicDialog,
-        backgroundColor: mochaMousse,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

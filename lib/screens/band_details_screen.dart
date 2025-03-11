@@ -380,38 +380,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
 
         return Scaffold(
           backgroundColor: Color(0xFFF8F5F3), // Usando o mesmo backgroundColor da HomeScreen
-          appBar: AppBar(
-            title: Text(
-              widget.banda["nome"] ?? "Detalhes da banda",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: mochaMousse,
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(Icons.arrow_back, color: mochaMousse, size: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: null
-          ),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -422,6 +390,59 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                     constraints: const BoxConstraints(maxWidth: 800),
                     child: CustomScrollView(
                       slivers: [
+                        // Custom App Bar
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(Icons.arrow_back, color: mochaMousse, size: 24),
+                                  ),
+                                ),
+                                Text(
+                                  widget.banda["nome"] ?? "Detalhes da banda",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: mochaMousse,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.music_note, color: mochaMousse, size: 24),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         // Cabeçalho da banda
                         SliverToBoxAdapter(
                           child: Padding(
