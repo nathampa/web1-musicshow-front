@@ -17,8 +17,9 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
   late Future<List<Map<String, dynamic>>> _musicasFuture;
   final TextEditingController _musicIdController = TextEditingController();
 
-  // Definindo a cor Mocha Mousse, igual à BandDetailsScreen
+  // Definindo a cor Mocha Mousse, igual à HomeScreen
   static const Color mochaMousse = Color(0xFFA47864);
+  static const Color backgroundColor = Color(0xFFF8F5F3);
 
   Future<int?> _getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -44,7 +45,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             labelText: "ID da música",
-            labelStyle: TextStyle(color: Colors.black54),
+            labelStyle: const TextStyle(color: Colors.black54),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: mochaMousse.withOpacity(0.3)),
@@ -55,7 +56,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: mochaMousse, width: 2),
+              borderSide: const BorderSide(color: mochaMousse, width: 2),
             ),
             prefixIcon: const Icon(Icons.music_note, color: mochaMousse),
             filled: true,
@@ -68,10 +69,10 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               _musicIdController.clear();
               Navigator.pop(context);
             },
-            child: Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
             style: TextButton.styleFrom(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
           ElevatedButton(
@@ -79,7 +80,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               if (_musicIdController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Preencha o ID da música."),
+                    content: const Text("Preencha o ID da música."),
                     backgroundColor: Colors.red.shade400,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -96,7 +97,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                   _reloadMusicas();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Música adicionada com sucesso!", style: TextStyle(color: Colors.white)),
+                      content: const Text("Música adicionada com sucesso!", style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.green.shade400,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -105,7 +106,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Erro ao adicionar música."),
+                      content: const Text("Erro ao adicionar música."),
                       backgroundColor: Colors.red.shade400,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -120,9 +121,9 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               backgroundColor: mochaMousse,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text("Adicionar", style: TextStyle(fontSize: 16)),
+            child: const Text("Adicionar", style: TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -148,7 +149,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             labelText: "ID da música",
-            labelStyle: TextStyle(color: Colors.black54),
+            labelStyle: const TextStyle(color: Colors.black54),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: mochaMousse.withOpacity(0.3)),
@@ -159,7 +160,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: mochaMousse, width: 2),
+              borderSide: const BorderSide(color: mochaMousse, width: 2),
             ),
             prefixIcon: const Icon(Icons.music_off, color: mochaMousse),
             filled: true,
@@ -172,10 +173,10 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               _musicIdController.clear();
               Navigator.pop(context);
             },
-            child: Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
             style: TextButton.styleFrom(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
           ElevatedButton(
@@ -183,7 +184,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               if (_musicIdController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Preencha o ID da música."),
+                    content: const Text("Preencha o ID da música."),
                     backgroundColor: Colors.red.shade400,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -200,7 +201,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                   _reloadMusicas();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Música removida com sucesso!", style: TextStyle(color: Colors.white)),
+                      content: const Text("Música removida com sucesso!", style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.green.shade400,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -209,7 +210,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Erro ao remover música."),
+                      content: const Text("Erro ao remover música."),
                       backgroundColor: Colors.red.shade400,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -224,9 +225,9 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               backgroundColor: Colors.red.shade400,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text("Remover", style: TextStyle(fontSize: 16)),
+            child: const Text("Remover", style: TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -260,10 +261,10 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                 backgroundColor: mochaMousse,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                minimumSize: Size(double.infinity, 50),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                minimumSize: const Size(double.infinity, 50),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.add, size: 20),
@@ -272,7 +273,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -283,10 +284,10 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                 backgroundColor: Colors.red.shade400,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                minimumSize: Size(double.infinity, 50),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                minimumSize: const Size(double.infinity, 50),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.remove, size: 20),
@@ -300,10 +301,10 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Fechar", style: TextStyle(color: Colors.black54, fontSize: 16)),
+            child: const Text("Fechar", style: TextStyle(color: Colors.black54, fontSize: 16)),
             style: TextButton.styleFrom(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
         ],
@@ -330,8 +331,8 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
-            backgroundColor: mochaMousse.withOpacity(0.1),
-            body: Center(child: CircularProgressIndicator(color: mochaMousse)),
+            backgroundColor: backgroundColor,
+            body: const Center(child: CircularProgressIndicator(color: mochaMousse)),
           );
         }
 
@@ -340,72 +341,151 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
         final bool isResponsavel = idResponsavel == userId;
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-                widget.repertorio["nome"] ?? "Detalhes do Repertório",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white
-                )
-            ),
-            backgroundColor: mochaMousse,
-            centerTitle: true,
-            elevation: 0,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
-            ),
-          ),
-          backgroundColor: mochaMousse.withOpacity(0.1),
+          backgroundColor: backgroundColor,
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 800),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Card superior com informações do repertório
-                          Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            elevation: 0,
-                            color: Colors.white,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(12),
+                    child: CustomScrollView(
+                      slivers: [
+                        // App Bar personalizado
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Botão Voltar
+                                InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: mochaMousse.withOpacity(0.1),
-                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
-                                    child: Icon(Icons.library_music, color: mochaMousse),
+                                    child: const Icon(Icons.arrow_back, color: mochaMousse, size: 24),
                                   ),
-                                  SizedBox(width: 16),
-                                  Expanded(
+                                ),
+                                // Título
+                                Text(
+                                  widget.repertorio["nome"] ?? "Detalhes do Repertório",
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: mochaMousse,
+                                  ),
+                                ),
+                                // Ícone de menu (pode ser usado para ações específicas)
+                                isResponsavel ? InkWell(
+                                  onTap: _showManageMusicsDialog,
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(Icons.more_vert, color: mochaMousse, size: 24),
+                                  ),
+                                ) : const SizedBox(width: 40),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Header com informações principais
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Container(
+                              height: 160,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [mochaMousse, mochaMousse.withOpacity(0.8)],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mochaMousse.withOpacity(0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    right: -20,
+                                    bottom: -20,
+                                    child: Icon(
+                                      Icons.library_music,
+                                      size: 150,
+                                      color: Colors.white.withOpacity(0.1),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(24),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          "Detalhes do Repertório",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: mochaMousse
+                                          widget.repertorio["nome"] ?? "Repertório",
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
                                           ),
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 8),
                                         Text(
-                                          "Repertório ${widget.repertorio["nome"]} | ID: ${widget.repertorio["idRepertorio"]}",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54
+                                          "ID: ${widget.repertorio["idRepertorio"]} | Banda: ${widget.banda["nome"]}",
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white70,
                                           ),
                                         ),
+                                        const SizedBox(height: 16),
+                                        isResponsavel
+                                            ? GestureDetector(
+                                          onTap: _showManageMusicsDialog,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            child: const Text(
+                                              "Gerenciar Músicas",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: mochaMousse,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                            : const SizedBox(),
                                       ],
                                     ),
                                   ),
@@ -413,117 +493,223 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 16),
-                          // Lista de músicas
-                          Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            elevation: 0,
-                            color: Colors.white,
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.music_note, color: mochaMousse),
-                                      SizedBox(width: 8),
-                                      Text(
-                                          "Músicas do Repertório",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: mochaMousse
-                                          )
-                                      ),
-                                    ],
+                        ),
+
+                        // Título da seção de músicas
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "Músicas do Repertório",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF333333),
                                   ),
-                                  Divider(color: mochaMousse.withOpacity(0.2), thickness: 1.5),
-                                  SizedBox(height: 8),
-                                  SizedBox(
-                                    height: 400,
-                                    child: FutureBuilder<List<Map<String, dynamic>>>(
-                                      future: _musicasFuture,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return Center(child: CircularProgressIndicator(color: mochaMousse));
-                                        } else if (snapshot.hasError) {
-                                          String errorMessage = snapshot.error.toString();
-                                          if (errorMessage.contains("O repertório não possui músicas")) {
-                                            return Center(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(Icons.music_off, color: Colors.black38, size: 48),
-                                                  SizedBox(height: 16),
-                                                  Text("O repertório não possui músicas.", style: TextStyle(color: Colors.black54, fontSize: 16)),
-                                                  SizedBox(height: 8),
-                                                  isResponsavel ? Text("Use o botão + abaixo para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)) : SizedBox(),
-                                                ],
-                                              ),
-                                            );
-                                          } else {
-                                            return Center(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
-                                                  SizedBox(height: 16),
-                                                  Text("Erro ao carregar músicas.", style: TextStyle(color: Colors.red.shade400)),
-                                                  SizedBox(height: 8),
-                                                  Text("${snapshot.error}", style: TextStyle(color: Colors.black54, fontSize: 12)),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    thickness: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Lista de músicas
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              elevation: 2,
+                              shadowColor: Colors.black.withOpacity(0.1),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: SizedBox(
+                                  height: 400,
+                                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                                    future: _musicasFuture,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const Center(child: CircularProgressIndicator(color: mochaMousse));
+                                      } else if (snapshot.hasError) {
+                                        String errorMessage = snapshot.error.toString();
+                                        if (errorMessage.contains("O repertório não possui músicas")) {
                                           return Center(
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Icon(Icons.music_off, color: Colors.black38, size: 48),
-                                                SizedBox(height: 16),
-                                                Text("Nenhuma música encontrada.", style: TextStyle(color: Colors.black54, fontSize: 16)),
-                                                SizedBox(height: 8),
-                                                isResponsavel ? Text("Use o botão + abaixo para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)) : SizedBox(),
+                                                const SizedBox(height: 16),
+                                                const Text("O repertório não possui músicas.", style: TextStyle(color: Colors.black54, fontSize: 16)),
+                                                const SizedBox(height: 8),
+                                                isResponsavel ? const Text("Use o botão abaixo para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)) : const SizedBox(),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          return Center(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.error_outline, color: Colors.red.shade400, size: 48),
+                                                const SizedBox(height: 16),
+                                                Text("Erro ao carregar músicas.", style: TextStyle(color: Colors.red.shade400)),
+                                                const SizedBox(height: 8),
+                                                Text("${snapshot.error}", style: const TextStyle(color: Colors.black54, fontSize: 12)),
                                               ],
                                             ),
                                           );
                                         }
+                                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                        return Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.music_off, color: Colors.black38, size: 48),
+                                              const SizedBox(height: 16),
+                                              const Text("Nenhuma música encontrada.", style: TextStyle(color: Colors.black54, fontSize: 16)),
+                                              const SizedBox(height: 8),
+                                              isResponsavel ? const Text("Use o botão abaixo para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)) : const SizedBox(),
+                                            ],
+                                          ),
+                                        );
+                                      }
 
-                                        return ListView.separated(
-                                          itemCount: snapshot.data!.length,
-                                          separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
-                                          itemBuilder: (context, index) {
-                                            final musica = snapshot.data![index];
-                                            return ListTile(
-                                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                              leading: CircleAvatar(
-                                                backgroundColor: mochaMousse.withOpacity(0.1),
-                                                child: Icon(Icons.music_note, color: mochaMousse),
+                                      return ListView.separated(
+                                        itemCount: snapshot.data!.length,
+                                        separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
+                                        itemBuilder: (context, index) {
+                                          final musica = snapshot.data![index];
+                                          return Card(
+                                            elevation: 0,
+                                            margin: const EdgeInsets.symmetric(vertical: 4),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            color: Colors.white,
+                                            child: ListTile(
+                                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                              leading: Container(
+                                                width: 50,
+                                                height: 50,
+                                                decoration: BoxDecoration(
+                                                  color: mochaMousse.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: const Icon(Icons.music_note, color: mochaMousse),
                                               ),
                                               title: Text(
                                                 musica["titulo"] ?? "Música desconhecida",
-                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                                                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                                               ),
                                               subtitle: Text(
                                                 "ID: ${musica["idMusica"]}",
-                                                style: TextStyle(fontSize: 12, color: Colors.black54),
+                                                style: const TextStyle(fontSize: 12, color: Colors.black54),
                                               ),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                              hoverColor: mochaMousse.withOpacity(0.1),
-                                            );
-                                          },
-                                        );
-                                      },
+                                              trailing: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: mochaMousse.withOpacity(0.1),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(Icons.arrow_forward, color: mochaMousse, size: 16),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Sobre o Repertório
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.03),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: mochaMousse.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(Icons.info_outline, color: mochaMousse),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        "Sobre o Repertório",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF333333),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    "Este repertório contém a lista de músicas que podem ser usadas em apresentações da banda. Você pode adicionar ou remover músicas conforme necessário.",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF666666),
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  isResponsavel
+                                      ? const Text(
+                                    "Como líder da banda, você pode gerenciar as músicas deste repertório.",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF666666),
+                                      height: 1.5,
+                                    ),
+                                  )
+                                      : const Text(
+                                    "Apenas o líder da banda pode modificar este repertório.",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF666666),
+                                      height: 1.5,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+
+                        // Espaço no final para o FAB não cobrir o conteúdo
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: 80),
+                        ),
+                      ],
                     ),
                   ),
                 );
