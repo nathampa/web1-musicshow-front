@@ -673,14 +673,72 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                             "ID: ${membro["idUsuario"]}",
                                             style: TextStyle(fontSize: 12, color: Colors.black54),
                                           ),
+                                          //Clicar no botão vermelho remove o membro
                                           trailing: isResponsavel && membro["idUsuario"] != userId ?
-                                          Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Colors.red.shade400.withOpacity(0.1),
-                                              shape: BoxShape.circle,
+                                          InkWell(
+                                            onTap: () async {
+                                              // Mostrar diálogo de confirmação
+                                              bool confirm = await showDialog(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  backgroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                  title: Text(
+                                                      "Remover membro",
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          color: mochaMousse,
+                                                          fontWeight: FontWeight.bold
+                                                      )
+                                                  ),
+                                                  content: Text(
+                                                    "Deseja remover o usuário ${membro["nome"]} (ID: ${membro["idUsuario"]}) da banda?",
+                                                    style: TextStyle(color: Colors.black87),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.pop(context, false),
+                                                      child: Text("Cancelar", style: TextStyle(color: Colors.black54)),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () => Navigator.pop(context, true),
+                                                      style: ElevatedButton.styleFrom(
+                                                        foregroundColor: Colors.white,
+                                                        backgroundColor: Colors.red.shade400,
+                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                      ),
+                                                      child: Text("Remover"),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ) ?? false;
+
+                                              if (confirm) {
+                                                await apiService.removeMember(widget.banda["idBanda"], membro["idUsuario"]);
+                                                // Recarregar a lista de membros
+                                                setState(() {
+                                                  _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
+                                                });
+
+                                                // Mostrar mensagem de sucesso
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text("Membro removido com sucesso!"),
+                                                    backgroundColor: Colors.green.shade400,
+                                                    behavior: SnackBarBehavior.floating,
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.shade400.withOpacity(0.1),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(Icons.remove_circle_outline, color: Colors.red.shade400, size: 16),
                                             ),
-                                            child: Icon(Icons.remove_circle_outline, color: Colors.red.shade400, size: 16),
                                           ) : null,
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                           hoverColor: mochaMousse.withOpacity(0.05),
