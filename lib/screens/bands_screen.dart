@@ -614,13 +614,6 @@ class _BandsScreenState extends State<BandsScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateBandaDialog,
-        backgroundColor: mochaMousse,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
     );
   }
 }
