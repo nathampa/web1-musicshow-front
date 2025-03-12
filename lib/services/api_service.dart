@@ -323,4 +323,54 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  /// Faz o download do arquivo PDF da música
+  Future<Uint8List> downloadMusicaPdf(int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.get(
+      Uri.parse("$baseUrl/musicas/baixarMusica/$musicaId"),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else if (response.statusCode == 404) {
+      throw Exception("Arquivo não encontrado.");
+    } else {
+      throw Exception("Erro ao fazer download do arquivo. Código: ${response.statusCode}");
+    }
+  }
+
+  /// Obter detalhes de uma música específica
+  Future<Map<String, dynamic>> getMusicaDetails(int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.get(
+      Uri.parse("$baseUrl/musicas/$musicaId"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return Map<String, dynamic>.from(jsonDecode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception("Música não encontrada.");
+    } else {
+      throw Exception("Erro ao buscar detalhes da música.");
+    }
+  }
 }

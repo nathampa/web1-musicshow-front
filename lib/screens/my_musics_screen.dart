@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
 import 'home_screen.dart';
+import 'pdf_viewer_screen.dart';
 
 class MyMusicsScreen extends StatefulWidget {
   const MyMusicsScreen({super.key});
@@ -184,6 +185,19 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
               child: const Text("Adicionar", style: TextStyle(fontSize: 16)),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Função para abrir o PDF viewer
+  void _openPdfViewer(BuildContext context, int musicaId, String titulo) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PdfViewerScreen(
+          musicaId: musicaId,
+          titulo: titulo,
         ),
       ),
     );
@@ -450,6 +464,9 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                     itemCount: snapshot.data!.length,
                                     itemBuilder: (context, index) {
                                       final musica = snapshot.data![index];
+                                      final int musicaId = musica["idMusica"] ?? 0;
+                                      final String titulo = musica["titulo"] ?? "Música desconhecida";
+
                                       return Card(
                                         margin: const EdgeInsets.only(bottom: 12),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -466,7 +483,7 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                             child: const Icon(Icons.music_note, color: mochaMousse),
                                           ),
                                           title: Text(
-                                            musica["titulo"] ?? "Música desconhecida",
+                                            titulo,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 16,
@@ -474,7 +491,7 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                             ),
                                           ),
                                           subtitle: Text(
-                                            "ID: ${musica["idMusica"]}",
+                                            "ID: $musicaId",
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.black.withOpacity(0.6),
@@ -486,11 +503,12 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                               color: mochaMousse.withOpacity(0.1),
                                               shape: BoxShape.circle,
                                             ),
-                                            child: const Icon(Icons.arrow_forward, color: mochaMousse, size: 16),
+                                            child: const Icon(Icons.visibility, color: mochaMousse, size: 16),
                                           ),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                           onTap: () {
-                                            // Ação ao tocar na música
+                                            // Navegar para a tela de visualização do PDF
+                                            _openPdfViewer(context, musicaId, titulo);
                                           },
                                         ),
                                       );
