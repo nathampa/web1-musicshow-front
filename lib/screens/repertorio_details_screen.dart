@@ -467,7 +467,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                                         ),
                                         const SizedBox(height: 16),
                                         isResponsavel
-                                            ? GestureDetector(
+                                            ? InkWell(
                                           onTap: _showManageMusicsDialog,
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -716,13 +716,6 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
               },
             ),
           ),
-          floatingActionButton: isResponsavel ? FloatingActionButton(
-            onPressed: _showManageMusicsDialog,
-            backgroundColor: mochaMousse,
-            elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.add, color: Colors.white),
-          ) : null,
         );
       },
     );
