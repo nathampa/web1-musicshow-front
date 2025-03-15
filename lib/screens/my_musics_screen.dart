@@ -454,7 +454,7 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                           const SizedBox(height: 16),
                                           const Text("Nenhuma música encontrada.", style: TextStyle(color: Colors.black54, fontSize: 16)),
                                           const SizedBox(height: 8),
-                                          const Text("Use o botão + abaixo para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)),
+                                          const Text("Use o botão 'Adicionar Música' acima para adicionar músicas.", style: TextStyle(color: Colors.black38, fontSize: 14)),
                                         ],
                                       ),
                                     );

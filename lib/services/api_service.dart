@@ -267,9 +267,9 @@ class ApiService {
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else if (response.statusCode == 404) {
-      throw Exception("Nenhuma música encontrada.");
+      return [];
     } else {
-      throw Exception("Erro ao buscar músicas do usuário.");
+      throw ("Erro ao buscar músicas do usuário.");
     }
   }
 
