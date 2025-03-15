@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled/screens/pdf_viewer_screen.dart';
 import '../services/api_service.dart';
 
 class RepertorioDetailsScreen extends StatefulWidget {
@@ -318,6 +319,19 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
     });
   }
 
+  // Função para abrir o PDF viewer
+  void _openPdfViewer(BuildContext context, int musicaId, String titulo) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PdfViewerScreen(
+          musicaId: musicaId,
+          titulo: titulo,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -587,6 +601,8 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                                         separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
                                         itemBuilder: (context, index) {
                                           final musica = snapshot.data![index];
+                                          final int musicaId = musica["idMusica"] ?? 0;
+                                          final String titulo = musica["titulo"] ?? "Música desconhecida";
                                           return Card(
                                             elevation: 0,
                                             margin: const EdgeInsets.symmetric(vertical: 4),
@@ -617,8 +633,13 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                                                   color: mochaMousse.withOpacity(0.1),
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: const Icon(Icons.arrow_forward, color: mochaMousse, size: 16),
+                                                child: const Icon(Icons.visibility, color: mochaMousse, size: 16),
                                               ),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                              onTap: () {
+                                                // Navegar para a tela de visualização do PDF
+                                                _openPdfViewer(context, musicaId, titulo);
+                                              },
                                             ),
                                           );
                                         },
