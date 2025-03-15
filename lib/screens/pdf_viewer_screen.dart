@@ -55,9 +55,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
         // Implementação para web
         final bytes = await apiService.downloadMusicaPdf(widget.musicaId);
 
-        // Log para depuração
-        print("PDF bytes recebidos: ${bytes.length}");
-
         if (bytes.isEmpty) {
           throw Exception("PDF vazio recebido da API");
         }
@@ -71,9 +68,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
         // Cria uma URL para o Blob
         _pdfUrl = html.Url.createObjectUrlFromBlob(blob);
 
-        print("URL do PDF criada: $_pdfUrl");
-        print("ID único do visualizador: $_uniqueId");
-
         // Registrar a view factory
         _registerViewFactory();
       }
@@ -82,7 +76,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
         _isLoading = false;
       });
     } catch (e) {
-      print("Erro ao carregar PDF: $e");
       setState(() {
         _isLoading = false;
         _errorMessage = e.toString();
@@ -95,7 +88,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
     if (_pdfUrl != null) {
       try {
         html.Url.revokeObjectUrl(_pdfUrl!);
-        print("URL anterior revogada: $_pdfUrl");
         _pdfUrl = null;
       } catch (e) {
         print("Erro ao revogar URL anterior: $e");
@@ -112,7 +104,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
       ui.platformViewRegistry.registerViewFactory(
         _uniqueId!,
             (int viewId) {
-          print("Criando elemento de visualização com ID: $_uniqueId");
 
           // Criar div container para garantir estabilidade
           final container = html.DivElement()
@@ -138,12 +129,9 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
         },
       );
 
-      print("View factory registrada com sucesso: $_uniqueId");
     } catch (e) {
-      print("Erro ao registrar view factory: $e");
       // Se já estiver registrado, tentar gerar novo ID único
       if (e.toString().contains('already registered')) {
-        print("Factory já registrada, gerando novo ID...");
         _uniqueId = '${_baseViewType}${widget.musicaId}-${DateTime.now().millisecondsSinceEpoch}-${_viewerCounter++}';
         Future.microtask(() => _registerViewFactory());
       }
@@ -152,7 +140,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
 
   @override
   void dispose() {
-    print("Dispose chamado para o PDF viewer: $_uniqueId");
     _limparRecursosAnteriores();
     super.dispose();
   }
@@ -164,7 +151,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
 
     return LayoutBuilder(
         builder: (context, constraints) {
-          print("Construindo HtmlElementView com viewType: $_uniqueId");
           return Container(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
@@ -189,7 +175,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
 
     return WillPopScope(
       onWillPop: () async {
-        print("WillPopScope acionado");
         _limparRecursosAnteriores();
         return true;
       },
