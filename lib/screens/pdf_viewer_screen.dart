@@ -303,34 +303,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> with AutomaticKeepAli
             child: Text("Não foi possível carregar o PDF"),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: mochaMousse,
-          onPressed: () {
-            if (_pdfUrl != null) {
-              // Cria um link para download e simula um clique
-              final anchor = html.AnchorElement(href: _pdfUrl!)
-                ..setAttribute('download', '${widget.titulo}.pdf')
-                ..click();
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Download iniciado"),
-                  backgroundColor: mochaMousse,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("PDF não disponível para download"),
-                  backgroundColor: Colors.amber.shade600,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          },
-          child: const Icon(Icons.download, color: Colors.white),
-        ),
       ),
     );
   }
