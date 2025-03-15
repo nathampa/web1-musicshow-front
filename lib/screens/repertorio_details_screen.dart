@@ -703,6 +703,36 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                           ),
                         ),
 
+                        //Instrução para responsável
+                        if (isResponsavel)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: mochaMousse.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.info_outline, color: mochaMousse, size: 18),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        "Arraste e solte as músicas para reorganizar a ordem do repertório.",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
                         // Lista de músicas
                         SliverToBoxAdapter(
                           child: Padding(
@@ -764,94 +794,156 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                                         );
                                       }
 
-                                      return ListView.separated(
+                                      return ReorderableListView.builder(
                                         itemCount: snapshot.data!.length,
-                                        separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
+                                        buildDefaultDragHandles: false, // Desativa as alças de arrastar padrão
+                                        onReorder: (oldIndex, newIndex) async {
+                                          if (oldIndex < newIndex) {
+                                            newIndex -= 1;
+                                          }
+
+                                          final List<Map<String, dynamic>> items = snapshot.data!;
+                                          final item = items.removeAt(oldIndex);
+                                          items.insert(newIndex, item);
+
+                                          setState(() {
+
+                                          });
+
+                                          //Extrai os IDs das músicas na nova ordem
+                                          final List<int> musicasIds = items
+                                              .map((item) => item["musica"]["idMusica"] as int)
+                                              .toList();
+
+                                          //Chama a API para atualizar a ordem
+                                          final success = await apiService.updateMusicasOrder(
+                                              widget.repertorio["idRepertorio"], musicasIds);
+
+                                          if (success) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: const Text("Ordem atualizada com sucesso!",
+                                                    style: TextStyle(color: Colors.white)),
+                                                backgroundColor: Colors.green.shade400,
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              ),
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: const Text("Erro ao atualizar a ordem."),
+                                                backgroundColor: Colors.red.shade400,
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              ),
+                                            );
+                                            // Recarrega a lista original se houver falha
+                                            _reloadMusicas();
+                                          }
+                                        },
                                         itemBuilder: (context, index) {
                                           final item = snapshot.data![index];
                                           final musica = item["musica"] ?? {};
                                           final bool isDisabled = !(item["status"] ?? false);
-
                                           final int musicaId = musica["idMusica"] ?? 0;
                                           final String titulo = musica["titulo"] ?? "Música desconhecida";
 
                                           return Card(
-                                              elevation: 0,
-                                              margin: const EdgeInsets.symmetric(vertical: 4),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                              color: isDisabled ? Colors.grey.shade100 : Colors.white,
-                                              child: ListTile(
-                                                contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                                leading: Container(
-                                                  width: 50,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                    color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(8),
-                                                  ),
-                                                  child: Icon(
-                                                      isDisabled ? Icons.music_off : Icons.music_note,
-                                                      color: isDisabled ? Colors.grey : mochaMousse
-                                                  ),
+                                            key: ValueKey(musicaId),
+                                            elevation: 0,
+                                            margin: const EdgeInsets.symmetric(vertical: 4),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            color: isDisabled ? Colors.grey.shade100 : Colors.white,
+                                            child: ListTile(
+                                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                              leading: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
                                                 ),
-                                                title: Text(
-                                                  musica["titulo"] ?? "Música desconhecida",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 16,
-                                                    color: isDisabled ? Colors.grey : Colors.black,
-                                                    decoration: isDisabled ? TextDecoration.lineThrough : TextDecoration.none,
+                                                child: Icon(
+                                                  isDisabled ? Icons.music_off : Icons.music_note,
+                                                  color: isDisabled ? Colors.grey : mochaMousse,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              title: Text(
+                                                titulo,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  color: isDisabled ? Colors.grey : Colors.black,
+                                                  decoration: isDisabled ? TextDecoration.lineThrough : TextDecoration.none,
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                isDisabled ? "ID: $musicaId (Desativada)" : "ID: $musicaId",
+                                                style: TextStyle(fontSize: 12, color: isDisabled ? Colors.grey : Colors.black54),
+                                              ),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  // Botão para visualizar
+                                                  Container(
+                                                    margin: const EdgeInsets.only(right: 8),
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(Icons.visibility,
+                                                        color: isDisabled ? Colors.grey : mochaMousse,
+                                                        size: 16
+                                                    ),
                                                   ),
-                                                ),
-                                                subtitle: Text(
-                                                  isDisabled ? "ID: ${musica["idMusica"]} (Desativada)" : "ID: ${musica["idMusica"]}",
-                                                  style: TextStyle(fontSize: 12, color: isDisabled ? Colors.grey : Colors.black54),
-                                                ),
-                                                trailing: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    // Botão para visualizar
+                                                  // Botão para desativar/reativar
+                                                  if (isResponsavel)
                                                     Container(
                                                       margin: const EdgeInsets.only(right: 8),
                                                       padding: const EdgeInsets.all(8),
                                                       decoration: BoxDecoration(
-                                                        color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
+                                                        color: isDisabled
+                                                            ? Colors.green.withOpacity(0.1)
+                                                            : Colors.orange.withOpacity(0.1),
                                                         shape: BoxShape.circle,
                                                       ),
-                                                      child: Icon(Icons.visibility,
-                                                          color: isDisabled ? Colors.grey : mochaMousse,
-                                                          size: 16
+                                                      child: GestureDetector(
+                                                        onTap: () => isDisabled
+                                                            ? _showReactivateMusicDialog(musicaId, titulo)
+                                                            : _showDisableMusicDialog(musicaId, titulo),
+                                                        child: Icon(
+                                                            isDisabled ? Icons.refresh : Icons.hide_source,
+                                                            color: isDisabled ? Colors.green : Colors.orange,
+                                                            size: 16
+                                                        ),
                                                       ),
                                                     ),
-                                                    // Botão para desativar/reativar (apenas para responsáveis)
-                                                    if (isResponsavel)
-                                                      Container(
+                                                  // Ícone de arrastar personalizado
+                                                  if (isResponsavel)
+                                                    ReorderableDragStartListener(
+                                                      index: index,
+                                                      child: Container(
                                                         padding: const EdgeInsets.all(8),
                                                         decoration: BoxDecoration(
-                                                          color: isDisabled
-                                                              ? Colors.green.withOpacity(0.1)
-                                                              : Colors.orange.withOpacity(0.1),
+                                                          color: Colors.grey.withOpacity(0.1),
                                                           shape: BoxShape.circle,
                                                         ),
-                                                        child: GestureDetector(
-                                                          onTap: () => isDisabled
-                                                              ? _showReactivateMusicDialog(musica["idMusica"], musica["titulo"])
-                                                              : _showDisableMusicDialog(musica["idMusica"], musica["titulo"]),
-                                                          child: Icon(
-                                                              isDisabled ? Icons.refresh : Icons.hide_source,
-                                                              color: isDisabled ? Colors.green : Colors.orange,
-                                                              size: 16
-                                                          ),
+                                                        child: Icon(Icons.drag_handle,
+                                                            color: Colors.grey.withOpacity(0.7),
+                                                            size: 16
                                                         ),
                                                       ),
-                                                  ],
-                                                ),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                onTap: () {
-                                                  // Navegar para a tela de visualização do PDF
-                                                  _openPdfViewer(context, musicaId, titulo);
-                                                },
-                                              )
+                                                    ),
+                                                ],
+                                              ),
+                                              onTap: () {
+                                                // Navegar para a tela de visualização do PDF
+                                                _openPdfViewer(context, musicaId, titulo);
+                                              },
+                                            ),
                                           );
                                         },
                                       );
