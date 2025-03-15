@@ -196,7 +196,7 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
 
               int? musicId = int.tryParse(_musicIdController.text);
               if (musicId != null) {
-                bool success = await apiService.removeMember(widget.repertorio["idRepertorio"], musicId);
+                bool success = await apiService.deleteMusicOfRepertorio(widget.repertorio["idRepertorio"], musicId);
                 if (success) {
                   Navigator.pop(context);
                   _reloadMusicas();

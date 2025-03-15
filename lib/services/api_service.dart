@@ -323,6 +323,55 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  ///Desativa uma musica do repertório
+  Future<bool> disableMusicOfRepertorio(int repertorioId, int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/repertorios/desativarMusica"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "idRepertorio": repertorioId,
+        "idMusica": musicaId,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  ///Exclui uma musica do repertório
+  Future<bool> deleteMusicOfRepertorio(int repertorioId, int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/repertorios/excluirMusica"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "idRepertorio": repertorioId,
+        "idMusica": musicaId,
+      }),
+    );
+
+    print(response.body);
+    return response.statusCode == 200;
+  }
+
   /// Faz o download do arquivo PDF da música
   Future<Uint8List> downloadMusicaPdf(int musicaId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
