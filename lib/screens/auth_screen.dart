@@ -25,7 +25,12 @@ class _AuthScreenState extends State<AuthScreen> {
   static const Color backgroundColor = Color(0xFFF8F5F3);
 
   void _toggleAuthMode() {
-    setState(() => isLogin = !isLogin);
+    setState((){
+      isLogin = !isLogin;
+      nomeController.clear();
+      loginController.clear();
+      senhaController.clear();
+    });
   }
 
   void _authenticate() async {
