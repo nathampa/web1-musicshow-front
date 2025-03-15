@@ -313,6 +313,174 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
     );
   }
 
+  void _showDisableMusicDialog(int musicId, String titulo) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+            "Desativar música",
+            style: TextStyle(
+                fontSize: 20,
+                color: mochaMousse,
+                fontWeight: FontWeight.bold
+            )
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              "Deseja desativar a música \"$titulo\" do repertório?",
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "A música permanecerá no banco de dados, mas não será exibida neste repertório.",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              bool success = await apiService.disableMusicOfRepertorio(
+                  widget.repertorio["idRepertorio"],
+                  musicId
+              );
+              Navigator.pop(context);
+
+              if (success) {
+                _reloadMusicas();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text("Música desativada com sucesso!", style: TextStyle(color: Colors.white)),
+                    backgroundColor: Colors.green.shade400,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text("Erro ao desativar música."),
+                    backgroundColor: Colors.red.shade400,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.orange,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text("Desativar", style: TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReactivateMusicDialog(int musicId, String titulo) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+            "Reativar música",
+            style: TextStyle(
+                fontSize: 20,
+                color: mochaMousse,
+                fontWeight: FontWeight.bold
+            )
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check_circle_outline, color: Colors.green, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              "Deseja reativar a música \"$titulo\" no repertório?",
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "A música voltará a aparecer normalmente neste repertório.",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.black54, fontSize: 16)),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              bool success = await apiService.enableMusicOfRepertorio(
+                  widget.repertorio["idRepertorio"],
+                  musicId
+              );
+              Navigator.pop(context);
+
+              if (success) {
+                _reloadMusicas();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text("Música reativada com sucesso!", style: TextStyle(color: Colors.white)),
+                    backgroundColor: Colors.green.shade400,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text("Erro ao reativar música."),
+                    backgroundColor: Colors.red.shade400,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.green,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text("Reativar", style: TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _reloadMusicas() {
     setState(() {
       _musicasFuture = apiService.getMusicasRepertorio(widget.repertorio["idRepertorio"]);
@@ -600,47 +768,90 @@ class _RepertorioDetailsScreenState extends State<RepertorioDetailsScreen> {
                                         itemCount: snapshot.data!.length,
                                         separatorBuilder: (context, index) => Divider(height: 1, color: mochaMousse.withOpacity(0.2)),
                                         itemBuilder: (context, index) {
-                                          final musica = snapshot.data![index];
+                                          final item = snapshot.data![index];
+                                          final musica = item["musica"] ?? {};
+                                          final bool isDisabled = !(item["status"] ?? false);
+
                                           final int musicaId = musica["idMusica"] ?? 0;
                                           final String titulo = musica["titulo"] ?? "Música desconhecida";
+
                                           return Card(
-                                            elevation: 0,
-                                            margin: const EdgeInsets.symmetric(vertical: 4),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                            color: Colors.white,
-                                            child: ListTile(
-                                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                              leading: Container(
-                                                width: 50,
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                  color: mochaMousse.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(Icons.music_note, color: mochaMousse),
-                                              ),
-                                              title: Text(
-                                                musica["titulo"] ?? "Música desconhecida",
-                                                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-                                              ),
-                                              subtitle: Text(
-                                                "ID: ${musica["idMusica"]}",
-                                                style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                              ),
-                                              trailing: Container(
-                                                padding: const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: mochaMousse.withOpacity(0.1),
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: const Icon(Icons.visibility, color: mochaMousse, size: 16),
-                                              ),
+                                              elevation: 0,
+                                              margin: const EdgeInsets.symmetric(vertical: 4),
                                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                              onTap: () {
-                                                // Navegar para a tela de visualização do PDF
-                                                _openPdfViewer(context, musicaId, titulo);
-                                              },
-                                            ),
+                                              color: isDisabled ? Colors.grey.shade100 : Colors.white,
+                                              child: ListTile(
+                                                contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                                leading: Container(
+                                                  width: 50,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Icon(
+                                                      isDisabled ? Icons.music_off : Icons.music_note,
+                                                      color: isDisabled ? Colors.grey : mochaMousse
+                                                  ),
+                                                ),
+                                                title: Text(
+                                                  musica["titulo"] ?? "Música desconhecida",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16,
+                                                    color: isDisabled ? Colors.grey : Colors.black,
+                                                    decoration: isDisabled ? TextDecoration.lineThrough : TextDecoration.none,
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  isDisabled ? "ID: ${musica["idMusica"]} (Desativada)" : "ID: ${musica["idMusica"]}",
+                                                  style: TextStyle(fontSize: 12, color: isDisabled ? Colors.grey : Colors.black54),
+                                                ),
+                                                trailing: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    // Botão para visualizar
+                                                    Container(
+                                                      margin: const EdgeInsets.only(right: 8),
+                                                      padding: const EdgeInsets.all(8),
+                                                      decoration: BoxDecoration(
+                                                        color: isDisabled ? Colors.grey.withOpacity(0.1) : mochaMousse.withOpacity(0.1),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(Icons.visibility,
+                                                          color: isDisabled ? Colors.grey : mochaMousse,
+                                                          size: 16
+                                                      ),
+                                                    ),
+                                                    // Botão para desativar/reativar (apenas para responsáveis)
+                                                    if (isResponsavel)
+                                                      Container(
+                                                        padding: const EdgeInsets.all(8),
+                                                        decoration: BoxDecoration(
+                                                          color: isDisabled
+                                                              ? Colors.green.withOpacity(0.1)
+                                                              : Colors.orange.withOpacity(0.1),
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: GestureDetector(
+                                                          onTap: () => isDisabled
+                                                              ? _showReactivateMusicDialog(musica["idMusica"], musica["titulo"])
+                                                              : _showDisableMusicDialog(musica["idMusica"], musica["titulo"]),
+                                                          child: Icon(
+                                                              isDisabled ? Icons.refresh : Icons.hide_source,
+                                                              color: isDisabled ? Colors.green : Colors.orange,
+                                                              size: 16
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                onTap: () {
+                                                  // Navegar para a tela de visualização do PDF
+                                                  _openPdfViewer(context, musicaId, titulo);
+                                                },
+                                              )
                                           );
                                         },
                                       );

@@ -347,6 +347,30 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  /// Reativa uma música que foi desativada do repertório
+  Future<bool> enableMusicOfRepertorio(int repertorioId, int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/repertorios/ativarMusica"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "idRepertorio": repertorioId,
+        "idMusica": musicaId,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
   ///Exclui uma musica do repertório
   Future<bool> deleteMusicOfRepertorio(int repertorioId, int musicaId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
