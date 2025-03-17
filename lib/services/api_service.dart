@@ -131,6 +131,30 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  ///Remove uma musica em especifico
+  Future<bool> excluirMusica(int musicaId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) return false;
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/musicas/excluirMusica/$musicaId"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"idMusica": musicaId}),
+    );
+
+    if(response.statusCode == 200){
+      return true;
+    }else{
+      return false;
+    }
+
+  }
+
   /// Cria um novo repertório para uma banda
   Future<String> createRepertorio(int bandaId, String nomeRepertorio) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

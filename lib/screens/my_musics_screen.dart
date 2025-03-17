@@ -202,6 +202,74 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
       ),
     );
   }
+  void _excluirItem(BuildContext context, int musicaId, String titulo) {
+    // Mostrar diálogo de confirmação
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Confirmar exclusão"),
+        content: Text("Deseja realmente excluir a música '$titulo'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Fechar o diálogo
+
+              // Mostrar indicador de carregamento
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(
+                    color: mochaMousse,
+                  ),
+                ),
+              );
+
+              // Chamar a API para excluir
+              final ApiService apiService = ApiService(); // Ou use sua instância existente
+              final bool sucesso = await apiService.excluirMusica(musicaId);
+
+              // Fechar o indicador de carregamento
+              Navigator.pop(context);
+
+              // Mostrar resultado
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    sucesso
+                        ? "Música excluída com sucesso!"
+                        : "Erro ao excluir música. Tente novamente.",
+                  ),
+                  backgroundColor: sucesso ? Colors.green : Colors.red,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+
+              // Se foi excluído com sucesso, atualize a lista (você pode chamar setState ou atualizar sua stream/provider)
+              if (sucesso) {
+                // Opção 1: Se estiver usando SetState
+                // setState(() {
+                //   // Remover o item da sua lista local
+                //   suaListaDeMusicas.removeWhere((item) => item.id == musicaId);
+                // });
+
+                // Opção 2: Se estiver usando Provider
+                // Provider.of<SeuModelo>(context, listen: false).removerMusica(musicaId);
+
+                // Opção 3: Se estiver usando BLoC/Cubit
+                // context.read<SeuBloc>().add(MusicaExcluidaEvent(musicaId));
+              }
+            },
+            child: const Text("Excluir", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -497,13 +565,39 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                               color: Colors.black.withOpacity(0.6),
                                             ),
                                           ),
-                                          trailing: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: mochaMousse.withOpacity(0.1),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(Icons.visibility, color: mochaMousse, size: 16),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  // Ação para excluir o item
+                                                  _excluirItem(context, musicaId, titulo );
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(8),
+                                                  margin: const EdgeInsets.only(right: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(Icons.delete, color: Colors.red, size: 16),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  // Navegar para a tela de visualização do PDF
+                                                  _openPdfViewer(context, musicaId, titulo);
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: mochaMousse.withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(Icons.visibility, color: mochaMousse, size: 16),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                           onTap: () {
