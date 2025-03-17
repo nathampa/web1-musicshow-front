@@ -2,7 +2,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../services/api_service.dart';
-import 'dart:ui' as ui;
+import 'dart:ui_web' as ui;
 
 class PdfViewerScreen extends StatefulWidget {
   final int musicaId;
