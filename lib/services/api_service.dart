@@ -247,6 +247,32 @@ class ApiService {
     }
   }
 
+  /// Busca as músicas ativas de um repertório
+  Future<List<Map<String, dynamic>>> getMusicasAtivasRepertorio(int repertorioId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    final response = await http.get(
+      Uri.parse("http://localhost:8080/repertorios/listarMusicasAtivasRepertorio/$repertorioId"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    }else if (response.statusCode == 404){
+      throw Exception("O repertório não possui músicas.");
+    } else {
+      throw Exception("Erro ao buscar músicas do repertório.");
+    }
+  }
+
   /// Busca as músicas do usuário logado
   Future<List<Map<String, dynamic>>> getMinhasMusicas() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

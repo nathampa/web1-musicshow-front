@@ -208,9 +208,9 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   void _loadMusicas() async {
     if (_repertorioId == null) return;
     try {
-      final List<dynamic> musicasRaw = await apiService.getMusicasRepertorio(_repertorioId!);
+      final List<dynamic> musicasRaw = await apiService.getMusicasAtivasRepertorio(_repertorioId!);
       setState(() {
-        _musicas = musicasRaw.map((item) => item["musica"] as Map<String, dynamic>).toList();
+        _musicas = musicasRaw.map((item) => item as Map<String, dynamic>).toList();
         _updateAdjacentSongs();
       });
     } catch (e) {
