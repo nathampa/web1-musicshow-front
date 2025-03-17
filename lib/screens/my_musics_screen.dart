@@ -202,72 +202,59 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
       ),
     );
   }
-  void _excluirItem(BuildContext context, int musicaId, String titulo) {
-    // Mostrar diálogo de confirmação
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Confirmar exclusão"),
-        content: Text("Deseja realmente excluir a música '$titulo'?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
+  void _excluirItem(BuildContext context, int musicaId, String titulo) async {
+      bool confirm = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+              "Remover música",
+              style: TextStyle(fontSize: 20, color: mochaMousse, fontWeight: FontWeight.bold)),
+          content: Text(
+            "Deseja remover a música $titulo?",
+            style: TextStyle(color: Colors.black87),
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context); // Fechar o diálogo
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text("Cancelar", style: TextStyle(color: Colors.black54)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.red.shade400,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text("Remover"),
+            ),
+          ],
+        ),
+      ) ?? false;
 
-              // Mostrar indicador de carregamento
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => const Center(
-                  child: CircularProgressIndicator(
-                    color: mochaMousse,
-                  ),
-                ),
-              );
-
-              // Chamar a API para excluir
-              final ApiService apiService = ApiService(); // Ou use sua instância existente
-              final bool sucesso = await apiService.excluirMusica(musicaId);
-
-              // Fechar o indicador de carregamento
-              Navigator.pop(context);
-
-              // Mostrar resultado
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    sucesso
-                        ? "Música excluída com sucesso!"
-                        : "Erro ao excluir música. Tente novamente.",
-                  ),
-                  backgroundColor: sucesso ? Colors.green : Colors.red,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-
-              // Se foi excluído com sucesso, atualize a lista (você pode chamar setState ou atualizar sua stream/provider)
-              if (sucesso) {
-                // Opção 1: Se estiver usando SetState
-                // setState(() {
-                //   // Remover o item da sua lista local
-                //   suaListaDeMusicas.removeWhere((item) => item.id == musicaId);
-                // });
-
-                // Opção 2: Se estiver usando Provider
-                // Provider.of<SeuModelo>(context, listen: false).removerMusica(musicaId);
-
-                // Opção 3: Se estiver usando BLoC/Cubit
-                // context.read<SeuBloc>().add(MusicaExcluidaEvent(musicaId));
-              }
-            },
-            child: const Text("Excluir", style: TextStyle(color: Colors.red)),
+      if (confirm) {
+        await apiService.excluirMusica(musicaId);
+        setState(() {
+          _loadMusics();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Membro removido com sucesso!"),
+            backgroundColor: Colors.green.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
-        ],
-      ),
+        );
+      }
+
+    child: Container(
+    padding: EdgeInsets.all(8),
+    decoration: BoxDecoration(
+    color: Colors.red.shade400.withOpacity(0.1),
+    shape: BoxShape.circle,
+    ),
+    child: Icon(Icons.remove_circle_outline, color: Colors.red.shade400, size: 16),
     );
   }
 
@@ -568,22 +555,22 @@ class _MyMusicsScreenState extends State<MyMusicsScreen> {
                                           trailing: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              GestureDetector(
+                                              InkWell(
                                                 onTap: () {
                                                   // Ação para excluir o item
                                                   _excluirItem(context, musicaId, titulo );
                                                 },
                                                 child: Container(
                                                   padding: const EdgeInsets.all(8),
-                                                  margin: const EdgeInsets.only(right: 8),
+                                                  margin: const EdgeInsets.only(right: 5),
                                                   decoration: BoxDecoration(
                                                     color: Colors.red.withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                   ),
-                                                  child: const Icon(Icons.delete, color: Colors.red, size: 16),
+                                                  child: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 16),
                                                 ),
                                               ),
-                                              GestureDetector(
+                                              InkWell(
                                                 onTap: () {
                                                   // Navegar para a tela de visualização do PDF
                                                   _openPdfViewer(context, musicaId, titulo);
