@@ -469,4 +469,6 @@ class ApiService {
       throw Exception("Erro ao buscar detalhes da música.");
     }
   }
+
+
 }

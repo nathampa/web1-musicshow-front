@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'live_session_screen.dart';
 import 'repertorio_details_screen.dart';
 
 class BandDetailsScreen extends StatefulWidget {
@@ -359,6 +360,150 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
     );
   }
 
+  void _startLiveSession(BuildContext context) {
+    // Show dialog to select repertoire
+    showDialog(
+      context: context,
+      builder: (context) {
+        int? selectedRepertorioId;
+        String? selectedRepertorioName;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text(
+                  "Iniciar Sessão ao Vivo",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: mochaMousse,
+                      fontWeight: FontWeight.bold
+                  )
+              ),
+              content: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _repertoriosFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator(color: mochaMousse));
+                  } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.library_music, color: Colors.red.shade400, size: 48),
+                          SizedBox(height: 16),
+                          Text("Nenhum repertório disponível", style: TextStyle(color: Colors.red.shade400)),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Selecione um repertório para a sessão:", style: TextStyle(fontSize: 16)),
+                      SizedBox(height: 16),
+                      Container(
+                        height: 200,
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: mochaMousse.withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListView.separated(
+                          padding: EdgeInsets.all(8),
+                          itemCount: snapshot.data!.length,
+                          separatorBuilder: (context, index) => Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final repertorio = snapshot.data![index];
+                            final isSelected = selectedRepertorioId == repertorio["idRepertorio"];
+
+                            return ListTile(
+                              title: Text(repertorio["nome"], style: TextStyle(fontWeight: FontWeight.w500)),
+                              subtitle: Text("ID: ${repertorio["idRepertorio"]}"),
+                              leading: Icon(Icons.music_note, color: mochaMousse),
+                              trailing: isSelected ? Icon(Icons.check_circle, color: mochaMousse) : null,
+                              selected: isSelected,
+                              onTap: () {
+                                setState(() {
+                                  selectedRepertorioId = repertorio["idRepertorio"];
+                                  selectedRepertorioName = repertorio["nome"];
+                                });
+                              },
+                              tileColor: isSelected ? mochaMousse.withOpacity(0.1) : null,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar", style: TextStyle(color: Colors.black54)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (selectedRepertorioId != null) {
+                      Navigator.pop(context);
+                      // Navigate to LiveSessionScreen as leader with consistent parameters
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LiveSessionScreen(
+                            banda: widget.banda,
+                            repertorio: {
+                              "idRepertorio": selectedRepertorioId,
+                              "nome": selectedRepertorioName,
+                            },
+                            isLeader: true,
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Selecione um repertório"),
+                          backgroundColor: Colors.red.shade400,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: mochaMousse,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text("Iniciar"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _joinLiveSession(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LiveSessionScreen(
+          banda: widget.banda,
+          repertorio: null, // Repertório será obtido via WebSocket
+          isLeader: false,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int?>(
@@ -366,11 +511,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: mochaMousse,
-              ),
-            ),
+            body: Center(child: CircularProgressIndicator(color: mochaMousse)),
           );
         }
 
@@ -379,18 +520,16 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
         final bool isResponsavel = idResponsavel == userId;
 
         return Scaffold(
-          backgroundColor: Color(0xFFF8F5F3), // Usando o mesmo backgroundColor da HomeScreen
+          backgroundColor: backgroundColor,
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final bool isWideScreen = constraints.maxWidth > 600;
-
                 return Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 800),
                     child: CustomScrollView(
                       slivers: [
-                        // Custom App Bar
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -418,11 +557,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                 ),
                                 Text(
                                   widget.banda["nome"] ?? "Detalhes da banda",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: mochaMousse,
-                                  ),
+                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: mochaMousse),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.all(8),
@@ -443,7 +578,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             ),
                           ),
                         ),
-                        // Cabeçalho da banda
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
@@ -469,11 +603,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                   Positioned(
                                     right: -20,
                                     bottom: -20,
-                                    child: Icon(
-                                      Icons.music_note,
-                                      size: 150,
-                                      color: Colors.white.withOpacity(0.1),
-                                    ),
+                                    child: Icon(Icons.music_note, size: 150, color: Colors.white.withOpacity(0.1)),
                                   ),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -489,11 +619,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                       SizedBox(height: 16),
                                       Text(
                                         widget.banda["nome"] ?? "Nome desconhecido",
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
+                                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
                                         textAlign: TextAlign.center,
                                       ),
                                       SizedBox(height: 8),
@@ -506,10 +632,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                               color: Colors.white.withOpacity(0.2),
                                               borderRadius: BorderRadius.circular(20),
                                             ),
-                                            child: Text(
-                                              "ID: ${widget.banda["idBanda"]}",
-                                              style: TextStyle(fontSize: 14, color: Colors.white),
-                                            ),
+                                            child: Text("ID: ${widget.banda["idBanda"]}", style: TextStyle(fontSize: 14, color: Colors.white)),
                                           ),
                                           SizedBox(width: 8),
                                           Container(
@@ -522,16 +645,12 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                               children: [
                                                 Icon(Icons.person, color: Colors.white, size: 14),
                                                 SizedBox(width: 4),
-                                                Text(
-                                                  "Resp: ${widget.banda["idResponsavel"]}",
-                                                  style: TextStyle(fontSize: 14, color: Colors.white),
-                                                ),
+                                                Text("Resp: ${widget.banda["idResponsavel"]}", style: TextStyle(fontSize: 14, color: Colors.white)),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
-                                      // Adicionar os botões de controle apenas para o responsável
                                       if (isResponsavel) ...[
                                         SizedBox(height: 24),
                                         Row(
@@ -565,8 +684,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             ),
                           ),
                         ),
-
-                        // Título da seção Membros
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -583,25 +700,16 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                 SizedBox(width: 12),
                                 Text(
                                   "Membros da Banda",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF333333),
-                                  ),
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
                                 ),
                                 SizedBox(width: 8),
                                 Expanded(
-                                  child: Divider(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    thickness: 1.5,
-                                  ),
+                                  child: Divider(color: Colors.grey.withOpacity(0.3), thickness: 1.5),
                                 ),
                               ],
                             ),
                           ),
                         ),
-
-                        // Lista de Membros
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -669,15 +777,10 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                             membro["nome"] ?? "Usuário desconhecido",
                                             style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333)),
                                           ),
-                                          subtitle: Text(
-                                            "ID: ${membro["idUsuario"]}",
-                                            style: TextStyle(fontSize: 12, color: Colors.black54),
-                                          ),
-                                          //Clicar no botão vermelho remove o membro
-                                          trailing: isResponsavel && membro["idUsuario"] != userId ?
-                                          InkWell(
+                                          subtitle: Text("ID: ${membro["idUsuario"]}", style: TextStyle(fontSize: 12, color: Colors.black54)),
+                                          trailing: isResponsavel && membro["idUsuario"] != userId
+                                              ? InkWell(
                                             onTap: () async {
-                                              // Mostrar diálogo de confirmação
                                               bool confirm = await showDialog(
                                                 context: context,
                                                 builder: (context) => AlertDialog(
@@ -685,12 +788,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                                   title: Text(
                                                       "Remover membro",
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: mochaMousse,
-                                                          fontWeight: FontWeight.bold
-                                                      )
-                                                  ),
+                                                      style: TextStyle(fontSize: 20, color: mochaMousse, fontWeight: FontWeight.bold)),
                                                   content: Text(
                                                     "Deseja remover o usuário ${membro["nome"]} (ID: ${membro["idUsuario"]}) da banda?",
                                                     style: TextStyle(color: Colors.black87),
@@ -715,12 +813,9 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
 
                                               if (confirm) {
                                                 await apiService.removeMember(widget.banda["idBanda"], membro["idUsuario"]);
-                                                // Recarregar a lista de membros
                                                 setState(() {
                                                   _membrosFuture = apiService.getBandMembers(widget.banda["idBanda"]);
                                                 });
-
-                                                // Mostrar mensagem de sucesso
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(
                                                     content: Text("Membro removido com sucesso!"),
@@ -739,7 +834,8 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                               ),
                                               child: Icon(Icons.remove_circle_outline, color: Colors.red.shade400, size: 16),
                                             ),
-                                          ) : null,
+                                          )
+                                              : null,
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                           hoverColor: mochaMousse.withOpacity(0.05),
                                         );
@@ -751,8 +847,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             ),
                           ),
                         ),
-
-                        // Título da seção Repertórios
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -769,25 +863,16 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                 SizedBox(width: 12),
                                 Text(
                                   "Repertórios da Banda",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF333333),
-                                  ),
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
                                 ),
                                 SizedBox(width: 8),
                                 Expanded(
-                                  child: Divider(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    thickness: 1.5,
-                                  ),
+                                  child: Divider(color: Colors.grey.withOpacity(0.3), thickness: 1.5),
                                 ),
                               ],
                             ),
                           ),
                         ),
-
-                        // Repertórios da Banda
                         SliverPadding(
                           padding: EdgeInsets.only(bottom: 24, left: 16, right: 16),
                           sliver: SliverToBoxAdapter(
@@ -877,7 +962,6 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                                   );
                                 }
 
-                                // Grid layout para telas largas, lista para telas estreitas
                                 if (isWideScreen) {
                                   return GridView.builder(
                                     shrinkWrap: true,
@@ -910,6 +994,94 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                             ),
                           ),
                         ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: mochaMousse.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(Icons.live_tv, color: mochaMousse, size: 20),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  "Sessão ao Vivo",
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(color: Colors.grey.withOpacity(0.3), thickness: 1.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
+                            child: Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.live_tv, size: 48, color: mochaMousse.withOpacity(0.7)),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "Utilize a sessão ao vivo para tocar com sua banda em tempo real",
+                                    style: TextStyle(fontSize: 16),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: 24),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (isResponsavel)
+                                        ElevatedButton.icon(
+                                          onPressed: () => _startLiveSession(context),
+                                          icon: Icon(Icons.play_circle_outline),
+                                          label: Text("Iniciar Sessão"),
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: mochaMousse,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                          ),
+                                        ),
+                                      if (!isResponsavel)
+                                        ElevatedButton.icon(
+                                          onPressed: () => _joinLiveSession(context),
+                                          icon: Icon(Icons.login),
+                                          label: Text("Entrar na Sessão"),
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor: mochaMousse,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -922,12 +1094,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
     );
   }
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    Color? color,
-  }) {
+  Widget _buildActionButton({required IconData icon, required String label, required VoidCallback onTap, Color? color}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(50),
@@ -942,20 +1109,12 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                 color: Colors.white.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                  icon,
-                  color: color ?? Colors.white,
-                  size: 20
-              ),
+              child: Icon(icon, color: color ?? Colors.white, size: 20),
             ),
             SizedBox(height: 8),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1001,22 +1160,12 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                       children: [
                         Text(
                           repertorio["nome"] ?? "Repertório desconhecido",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333),
-                          ),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 4),
-                        Text(
-                          "ID: ${repertorio["idRepertorio"]}",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black54,
-                          ),
-                        ),
+                        Text("ID: ${repertorio["idRepertorio"]}", style: TextStyle(fontSize: 12, color: Colors.black54)),
                       ],
                     ),
                   ),
@@ -1036,11 +1185,7 @@ class _BandDetailsScreenState extends State<BandDetailsScreen> {
                     children: [
                       Text(
                         "Ver detalhes",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: mochaMousse,
-                        ),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: mochaMousse),
                       ),
                       SizedBox(width: 4),
                       Icon(Icons.arrow_forward, size: 12, color: mochaMousse),
