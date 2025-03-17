@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import '../services/api_service.dart';
+import 'pdf_viewer.dart'; // Importe o novo widget
 
 class LiveSessionScreen extends StatefulWidget {
   final Map<String, dynamic> banda;
@@ -92,7 +93,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           } else if (type == "update-song" && data['bandaId'] == widget.banda["idBanda"]) {
             print("Atualizando música: ${data['songData']}");
             setState(() {
-              _currentSong = data['songData']; // Atualiza com songData diretamente
+              _currentSong = data['songData'];
             });
           } else if (data['bandaId'] == widget.banda["idBanda"] && data.containsKey('idMusica')) {
             print("Dados de música recebida: $data");
@@ -212,43 +213,76 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           style: const TextStyle(color: mochaMousse, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
+      body: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: _currentSong != null
-                ? Card(
-              child: ListTile(
-                leading: Icon(Icons.music_note, color: mochaMousse),
-                title: Text(_currentSong!["titulo"] ?? "Sem título"),
-                subtitle: Text("ID: ${_currentSong!["idMusica"]}"),
-              ),
-            )
-                : const Text("Nenhuma música selecionada", style: TextStyle(color: mochaMousse)),
-          ),
+          // Lista de músicas (esquerda)
           Expanded(
-            child: _musicas.isEmpty
-                ? Center(
-              child: _repertorioId == null
-                  ? const Text("Aguardando início da sessão...",
-                  style: TextStyle(color: mochaMousse))
-                  : const CircularProgressIndicator(color: mochaMousse),
-            )
-                : ListView.builder(
-              itemCount: _musicas.length,
-              itemBuilder: (context, index) {
-                final song = _musicas[index];
-                return ListTile(
-                  title: Text(song["titulo"] ?? "Sem título"),
-                  trailing: widget.isLeader
-                      ? ElevatedButton(
-                    onPressed: () => _changeSong(song),
-                    style: ElevatedButton.styleFrom(backgroundColor: mochaMousse),
-                    child: const Text("Tocar", style: TextStyle(color: Colors.white)),
+            flex: 1,
+            child: Column(
+              children: [
+                if (_currentSong != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Card(
+                      child: ListTile(
+                        leading: Icon(Icons.music_note, color: mochaMousse),
+                        title: Text(_currentSong!["titulo"] ?? "Sem título"),
+                        subtitle: Text("ID: ${_currentSong!["idMusica"]}"),
+                      ),
+                    ),
                   )
-                      : null,
-                );
-              },
+                else
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Nenhuma música selecionada", style: TextStyle(color: mochaMousse)),
+                  ),
+                Expanded(
+                  child: _musicas.isEmpty
+                      ? Center(
+                    child: _repertorioId == null
+                        ? const Text("Aguardando início da sessão...",
+                        style: TextStyle(color: mochaMousse))
+                        : const CircularProgressIndicator(color: mochaMousse),
+                  )
+                      : ListView.builder(
+                    itemCount: _musicas.length,
+                    itemBuilder: (context, index) {
+                      final song = _musicas[index];
+                      return ListTile(
+                        title: Text(song["titulo"] ?? "Sem título"),
+                        trailing: widget.isLeader
+                            ? ElevatedButton(
+                          onPressed: () => _changeSong(song),
+                          style: ElevatedButton.styleFrom(backgroundColor: mochaMousse),
+                          child: const Text("Tocar", style: TextStyle(color: Colors.white)),
+                        )
+                            : null,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Visualizador de PDF (direita)
+          Expanded(
+            flex: 2,
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: PdfViewer(
+                musicaId: _currentSong?["idMusica"],
+              ),
             ),
           ),
         ],
