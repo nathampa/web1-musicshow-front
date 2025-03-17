@@ -33,12 +33,15 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   bool _showSongList = false;
   static const Color mochaMousse = Color(0xFFA47864);
   static const Color backgroundColor = Color(0xFFF8F5F3);
-  late ScaffoldMessengerState _scaffoldMessenger; // Referência ao ScaffoldMessenger
+  late ScaffoldMessengerState _scaffoldMessenger;
+  bool _errorHandled = false; // Flag para evitar mensagens duplicadas
+  bool _isNavigatingBack = false;
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _scaffoldMessenger = ScaffoldMessenger.of(context); // Armazena a referência
+    _scaffoldMessenger = ScaffoldMessenger.of(context);
   }
 
   @override
@@ -91,14 +94,19 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               _updateAdjacentSongs();
             });
           } else if (type == "session-ended" && data['bandaId'] == widget.banda["idBanda"]) {
-            if (mounted) {
-              _scaffoldMessenger.showSnackBar(
-                const SnackBar(content: Text("Sessão encerrada pelo líder")),
-              );
+            if (mounted && !_isNavigatingBack) {
+              _isNavigatingBack = true;
+              // Só exibe a mensagem se não for o líder
+              if (!widget.isLeader) {
+                _scaffoldMessenger.showSnackBar(
+                  const SnackBar(content: Text("Sessão encerrada pelo líder")),
+                );
+              }
               Navigator.pop(context);
             }
           } else if (type == "error" && data['message'] == "Nenhuma sessão ativa para esta banda") {
             if (mounted) {
+              _errorHandled = true; // Marca que o erro foi tratado
               _scaffoldMessenger.showSnackBar(
                 const SnackBar(content: Text("Nenhuma sessão ativa para esta banda")),
               );
@@ -106,9 +114,17 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
             }
           }
         },
+        onError: (error) {
+          print("Erro no WebSocket: $error");
+          if (mounted && !_errorHandled) {
+            _scaffoldMessenger.showSnackBar(
+              SnackBar(content: Text("Erro na conexão: $error")),
+            );
+          }
+        },
         onDone: () {
           print("WebSocket fechado - Código: ${_channel.closeCode}, Motivo: ${_channel.closeReason}");
-          if (mounted) {
+          if (mounted && !_errorHandled) {
             _scaffoldMessenger.showSnackBar(
               const SnackBar(content: Text("Conexão WebSocket encerrada")),
             );
@@ -142,24 +158,36 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
   Future<void> _closeSession() async {
     try {
-      if (widget.isLeader) {
+      //Adiciona uma flag para controlar se o canal já está fechando
+      bool isClosing = false;
+
+      if (widget.isLeader && !isClosing) {
+        isClosing = true;
         _channel.sink.add(jsonEncode({
           "type": "end-session",
           "bandaId": widget.banda["idBanda"],
           "message": "Sessão ao vivo encerrada",
         }));
-        // Aumenta o atraso para garantir que o backend processe a mensagem
+        //Aguarde um momento para garantir que a mensagem seja enviada
         await Future.delayed(const Duration(milliseconds: 200));
       }
-      _channel.sink.close(status.normalClosure); // Usa 1000 em vez de 1001
+
+      //Agora feche a conexão
+      if (!isClosing) {
+        _channel.sink.close(status.normalClosure);
+      }
     } catch (e) {
       print("Erro ao fechar sessão: $e");
     }
   }
 
   Future<bool> _onWillPop() async {
-    await _closeSession();
-    return true;
+    if (!_isNavigatingBack) {
+      _isNavigatingBack = true;
+      await _closeSession();
+      return true;
+    }
+    return false;
   }
 
   void _updateAdjacentSongs() {
@@ -234,8 +262,11 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: mochaMousse),
             onPressed: () async {
-              await _closeSession();
-              if (mounted) Navigator.pop(context);
+              if (!_isNavigatingBack) {
+                _isNavigatingBack = true;
+                await _closeSession();
+                if (mounted) Navigator.pop(context);
+              }
             },
           ),
           title: Text(
